@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		
+<title>网络安全-CSRF/XSS/CORS-Jia</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="shortcut icon" type="image/x-icon" href="/image/favicon.ico">
+
+<link rel="stylesheet" href="/css/index.css">
+
+
+
+<meta name="keywords" content="浏览器,网络,">
+<meta name="description" content="">
+
+
+<script src="/js/jquery.min.js"></script>
+
+
+<script src="/js/index.js"></script>
+
+
+<script src="/js/fancybox.umd.js"></script>
+
+
+<script src="/js/fancybox-images.js"></script>
+
+
+<script src="/js/gitalk.min.js"></script>
+
+
+<script src="/js/hljs.min.js"></script>
+ 
+<script>hljs.highlightAll();</script>
+
+	<meta name="generator" content="Hexo 5.4.2"></head>
+
+	<body>
+		
+	<div class="header">
+		<div class="header-top" id="header-top">
+			<div class="h-left">
+				<a href="/">
+					<img src="/image/logo.png" alt="Quiet">
+				</a>
+			</div>
+			<div class="h-right">
+				<ul>
+					
+						
+								<li>
+									<a href="/">
+										ARTICLE
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+				</ul>
+			</div>
+			<div class="h-right-close">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+					<path fill="none" d="M0 0h24v24H0z" />
+					<path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z" fill="rgba(68,68,68,1)" />
+				</svg>
+			</div>
+		</div>
+	</div>
+	<div class="sidebar">
+    <div class="topo">
+        <h2>Jia</h2>
+    </div>
+    <ul>
+        
+        <li>
+            <a href="/">ARTICLE</a>
+        </li>
+        
+    </ul>
+    <div class="my_foot">
+        
+        <a href="">
+            <img src="/image/logo.png" alt="Quiet主题">
+        </a>
+        
+    </div>
+</div>
+<div class='shelter'>
+</div>
+<style>
+    .shelter{
+        background-color: #333;
+        opacity:0.5;
+        cursor: pointer;
+        display: none; 
+        position: fixed;
+        left: 0;
+        top: 0; 
+        right: 0;
+        bottom: 0;
+        z-index: 1998;
+    }
+    .sidebar {
+        width: 66%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        bottom: 0;
+        background: #fff;
+        z-index: 1999;
+        text-align: center;
+        box-shadow: -6px 0 20px rgba(98, 94, 94, .815);
+    }
+
+    .topo {
+        width: 100%;
+        height: 200px;
+        background: url(https://api.ixiaowai.cn/gqapi/gqapi.php) no-repeat;
+        background-size: 100% 100%;
+        position: relative;
+        display: flex;
+        align-items: flex-end
+    }
+
+    .topo h2 {
+        color: #fff;
+        z-index: 1;
+        position: relative;
+        margin: 0 0 10px 10px;
+        font-size: 1.2em;
+        box-sizing: border-box
+    }
+
+    .topo:before {
+        content: '';
+        background-image: url(/image/pattern.png);
+        background-repeat: repeat;
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        z-index: 1
+    }
+
+    .sidebar ul {
+        width: 100%;
+        margin-top: 50px
+    }
+
+    .sidebar ul li {
+        height: 50px;
+        list-style: none;
+        font-size: 1.2em;
+        text-align: right;
+        margin-right: 10px
+    }
+
+    .sidebar ul li a {
+        display: grid;
+        color: #5d606a;
+        text-overflow: ellipsis;
+        width: 100%;
+        text-decoration: none
+    }
+
+    .my_foot {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        position: absolute;
+        bottom: 0
+    }
+
+    .my_foot a {
+        text-decoration: none;
+        margin-right: 10px;
+        display: inline-block
+    }
+
+    .my_foot a img {
+        width: 30px;
+        height: 30px
+    }
+</style>
+
+<script>
+    $( function () {
+	$( '.h-right-close>svg' )
+		.click( function () {
+			$( '.sidebar' )
+				.animate( {
+					right: "0"
+				}, 500 );
+			$( '.shelter' )
+				.fadeIn( "slow" )
+		} );
+	$( '.shelter' )
+		.click( function ( e ) {
+			$( '.sidebar' )
+				.animate( {
+					right: "-100%"
+				}, 500 );
+			$( '.shelter' )
+				.fadeOut( "slow" )
+		} )
+} )
+
+</script>
+
+<div class="post">
+    <div class="post-header-background post-header-img">
+<!-- style="background: url('https://api.ixiaowai.cn/gqapi/gqapi.php')" -->
+    <div class="post-header-background-content">
+        <ul class="post-header-tag">
+            
+            
+            <li><a href="/tags/浏览器">浏览器</a></li>
+            
+            <li><a href="/tags/网络">网络</a></li>
+            
+            
+        </ul>
+        
+        <h1>网络安全-CSRF/XSS/CORS</h1>
+        <div class="post-header-info">
+            <div class="post-header-info-author">
+                
+                    <svg t="1604839279282" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                        xmlns="http://www.w3.org/2000/svg" p-id="2901" width="20" height="20">
+                        <path
+                            d="M513 956.3c-247.7 0-448-200.3-448-448S265.3 66.2 513 66.2s448 200.3 448 448-200.3 442.1-448 442.1z m0-830.9c-212.2 0-388.8 170.7-388.8 388.8C124.2 726.3 294.9 903 513 903c212.2 0 388.8-170.7 388.8-388.8S725.2 125.4 513 125.4z m0 430.2c-94.2 0-170.7-76.5-170.7-170.7S418.8 207.8 513 207.8s170.7 76.5 170.7 170.7S607.2 555.6 513 555.6z m0-289.1c-64.6 0-112 52.8-112 112s47.4 117.9 112 117.9 112-52.8 112-112-47.4-117.9-112-117.9z m0 689.8c-135.7 0-259-58.7-341.9-158.9l-11.8-17.8 11.8-17.8c76.5-117.9 206.2-188.5 347.8-188.5 135.7 0 265 64.6 341.9 182.6l11.8 17.8-11.8 17.8C778 897.1 648.7 956.3 513 956.3zM230.3 773.2C300.9 849.7 406.9 897 513 897c112 0 218.1-47.4 288.6-129.8-70.5-88.2-170.7-135.6-282.7-135.6s-218.1 53.3-288.6 141.6z"
+                            p-id="2902" fill="#ffffff"></path>
+                    </svg>
+                    
+                <span class="post-header-info-author-text"> <a href="../../about">Jia</a></span>
+                <!-- <div class="post-header-info-author-categories">
+                    
+                         <a href="../../categories/浏览器/" target="_blank" >浏览器</a>
+                    
+                </div> -->
+                <p>2022-04-22 18:53:11</p>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="post-content" id="content">
+  
+  <div id="article" class="post-content-info">
+    
+
+    <h2 id="CSRF"><a href="#CSRF" class="headerlink" title="CSRF"></a>CSRF</h2><ol>
+<li>概念：跨站点请求伪造，就是攻击者盗用用户身份发送恶意请求，如消息、邮件、盗号、购买商品等</li>
+<li>攻击原理：<ol>
+<li>用户登录受信网站 A，服务器通过身份验证并返回 cookie，此时根据浏览器规则缓存 cookie</li>
+<li>在 cookie 未过期前提下，用户访问恶意网站 B，B 嵌入一些恶意代码（如 GET/POST 表单、img 中 src、link 标签等）一旦用户进入 B 就会自动向 A 发送请求</li>
+<li>因 cookie 未过期，B 向 A 发请求会自动携带 cookie，导致服务器验证 cookie 通过，执行了恶意代码</li>
+<li>B 虽然和服务器不同源，但 B 的恶意代码是 script 或 某些设置的 img 标签是可以跨域的</li>
+</ol>
+</li>
+<li>CSRF 漏洞检测<ol>
+<li>抓取正常数据包，去掉 referer 字段重新提交，如果还有效，基本存在 CSRF 漏洞</li>
+<li>检测工具：CSRFTester、CSRF Request Builder</li>
+<li>检测工具检测原理：抓取浏览器中访问过的所有链接及表单等信息，通过工具修改对应表单等信息，重新提交，相当于伪造客户端请求，如果请求被服务器接受，则存在 CSRF 漏洞</li>
+</ol>
+</li>
+<li>防御<ol>
+<li>同源检测：用 HTTP 的 referer 字段标记来源<ul>
+<li>缺点1：依赖浏览器，在某些浏览器（IE6）已经有方法可以篡改 referer 值</li>
+<li>缺点2：用户可以设置浏览器发请求不提供 referer，会导致合法请求也无法访问服务器</li>
+</ul>
+</li>
+<li>token：请求参数中携带 token，token 可存储在 session 中</li>
+<li>HTTP 中自定义属性并验证：将 token 放在 HTTP 请求头中，适用于 axios 或 ajax，在发起请求前进时请求拦截</li>
+<li>验证码</li>
+</ol>
+</li>
+</ol>
+<h2 id="XSS"><a href="#XSS" class="headerlink" title="XSS"></a>XSS</h2><ol>
+<li>概念：跨站脚本攻击（Cross-site scripting, XSS，因避免和 CSS 混淆改叫 XSS）攻击者在网站注入恶意客户端代码，当受害者运行恶意代码（读取 cookie，session tokens，或者其它敏感的网站信息，或者让恶意脚本重写<a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Glossary/HTML">HTML</a>内容），攻击者可突破网站访问限制并冒充受害者</li>
+<li>常见场景：将 cookies 或其他隐私信息发送给攻击者，将受害者重定向到由攻击者控制的网页，或是经由恶意网站在受害者的机器上进行其他恶意操作。</li>
+<li>易被攻击路径：<ul>
+<li>数据从一个不可靠链接进入到一个 Web 应用程序</li>
+<li>没有过滤掉恶意代码的动态内容被发送给 Web 用户</li>
+</ul>
+</li>
+<li>分类<ol>
+<li>存储型 XSS：注入型脚本永久存储在目标服务器上，当浏览器请求数据时，脚本从服务器上传回并执行</li>
+<li>反射型 XSS：当用户点击恶意链接、提交表单、进入恶意网站时，注入脚本进入被攻击者网站，Web 服务器注入脚本，如错误信息、搜索结果等返回到用户浏览器上，浏览器认为这代码来自“可信任服务器”就会执行</li>
+<li>基于 DOM 的 XSS：修改原始的客户端代码，受害者浏览器的 DOM 环境改变，导致有效载荷的执行。也就是说，页面本身并没有变化，但由于 DOM 环境被恶意修改，有客户端代码被包含进了页面，并且意外执行。</li>
+</ol>
+</li>
+<li>防范<ol>
+<li>X-XSS-Protection：是 IE、Chrome、Safari HTTP 响应头特性，当检测到 XSS 时，浏览器停止加载页面<ul>
+<li>X-XSS-Protection: 0：禁止 XSS 过滤</li>
+<li>X-XSS-Protection: 1：开启 XSS 过滤，检测到 XSS，浏览器清除页面</li>
+<li>X-XSS-Protection: 1; mode=block：开启 XSS 过滤，检测到 XSS，浏览器不清除页面，而是阻止页面加载</li>
+<li>X-XSS-Protection: 1; report=<reporting-uri> ：开启 XSS 过滤，检测到 XSS，浏览器清除页面并使用 CSP 指令功能发送违规报告</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+<h2 id="CORS"><a href="#CORS" class="headerlink" title="CORS"></a>CORS</h2><ol>
+<li>CORS（跨域资源共享）：是一种基于 HTTP 头的机制，允许服务器标记其它源，使浏览器允许这些 origin 访问资源</li>
+<li>跨域：非同源间的请求为跨域，跨域限制访问，实际是浏览器限制</li>
+<li>同源：协议 、域名、端口号都相同，如 <code>[https://qq.com](https://qq.com)、[https://www.baidu.com](https://www.baidu.com)</code> 不同源目的：保护用户隐私</li>
+<li>预检请求：对于可能对服务器产生副作用的 HTTP 请求（复杂请求），浏览器必须先用 options 方法发起一个预检请求，从而获取服务端是否允许该跨域请求，允许后，才会将实际的请求发出去<ul>
+<li>作用：避免跨域请求对服务器用户数据产生未预期的影响</li>
+<li>Access-Control-Max-Age：设置预检请求可缓存的时间（s，默认 5s），在有效时间内，浏览器无需为同一请求发起多次预检</li>
+</ul>
+</li>
+<li>简单请求：不发生预检，直接向服务器请求，但目前 CORS 定义规范没有“简单请求”的说法了，需同时满足下面条件<ul>
+<li>GET、HEAD、POST</li>
+<li>允许人为设置字段是 CORS 安全首部字段集合：Accept、Accept-Language、Content-Language、Content-Type（application/x-www-form-urlencoded、mutipart/form-data、text/plain）、Last-Event-ID、range（只允许简单的范围首部值）</li>
+</ul>
+</li>
+<li>预检请求重定向：不是所有浏览器都支持（CORS 最初要求，后续废弃了），部分浏览器会报错<ul>
+<li>规避报错：在服务端去掉对预检请求的重定向或将实际请求变成一个简单请求</li>
+<li>发出简单请求，获取预检请求会返回的地址，然后使用该地址发起实际的请求（由于 Authorization 字段引起的预检不可用）</li>
+</ul>
+</li>
+<li>CSRF（跨站请求伪造漏洞）：冒充受信任用户，向服务器发送非预期请求的攻击，如在跳转 URL 中加入恶意参数<ul>
+<li>预防方案：验证 referer 请求来源地址（浏览器漏洞或用户设置不提供 referer 就会失效）、token、自定义属性验证来源用户</li>
+</ul>
+</li>
+<li>解决跨域：</li>
+</ol>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1. CORS（跨域资源共享）：提前声明可共享的请求,缺点是不支持 IE6\7\8\9</span></span><br><span class="line"><span class="comment">// 这是后端处理的，相当于设置白名单</span></span><br><span class="line">response.<span class="title function_">setHeader</span>(<span class="string">&#x27;Access-Control-Allow-Origin, &#x27;</span><span class="attr">https</span>:<span class="comment">//www.baidu.com&#x27;)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 2. JSONP：动态创建 script 标签发送请求，浏览器不拦截 script 资源请求，缺点只能发送 GET 请求</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">jsonp</span>(<span class="params">url</span>)&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Promise</span>(&#123;resolve,reject&#125;=&gt;&#123;</span><br><span class="line">    <span class="keyword">const</span> uniqueTag = <span class="title class_">Math</span>.<span class="title function_">random</span>(); <span class="comment">// 可用 symbol</span></span><br><span class="line">    <span class="variable language_">window</span>[uniqueTag] = data = &#123;</span><br><span class="line">      <span class="title function_">resolve</span>(data)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">const</span> script = <span class="variable language_">document</span>.<span class="title function_">createElement</span>(<span class="string">&#x27;script&#x27;</span>);</span><br><span class="line">    script.<span class="property">src</span> = <span class="string">`<span class="subst">$&#123;url&#125;</span>?callback=<span class="subst">$&#123;uniqueTag&#125;</span>`</span>;</span><br><span class="line">    script.<span class="property">onload</span> = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">      script.<span class="title function_">remove</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    script.<span class="property">onerror</span> = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="title function_">reject</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="variable language_">document</span>.<span class="property">body</span>.<span class="title function_">appendChild</span>(script);</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">jsonp</span>(<span class="string">&#x27;https://www.baidu.com&#x27;</span>).<span class="title function_">then</span>(<span class="function"><span class="params">data</span>=&gt;</span>&#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(data);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://juejin.cn/post/6912030758404259854">这一次，彻底理解XSS攻击</a><br><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/CORS">跨源资源共享（CORS）</a></p>
+
+  </div>
+  <div id=""></div>
+</div>
+
+<script>
+  
+Fancybox.bind('[data-fancybox="fancybox-gallery-img"]', {
+  dragToClose: true,
+  Toolbar: true,
+  closeButton: "top",
+  Image: {
+    zoom: true,
+  },
+  on: {
+    initCarousel: (fancybox) => {
+      const slide = fancybox.Carousel.slides[fancybox.Carousel.page];
+      fancybox.$container.style.setProperty(
+        "--bg-image",
+        `url("${slide.$thumb.src}")`
+      );
+    },
+    "Carousel.change": (fancybox, carousel, to, from) => {
+      const slide = carousel.slides[to];
+      fancybox.$container.style.setProperty(
+        "--bg-image",
+        `url("${slide.$thumb.src}")`
+      );
+    },
+  },
+});
+</script>
+
+<style>
+    #noneimg img {
+        display: none;
+        z-index: 9999;
+        /* width: 600px !important; */
+        min-width: 0%;
+        max-width: 90%;
+        max-height: 80%;
+        border-radius: 0px;
+        position: fixed;
+        box-shadow: 0 0 0px #c3c3c300 !important;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto !important;
+    }
+
+    @media screen and (max-width:600px) {
+        #noneimg img {
+            max-width: 88%
+        }
+    }
+</style>
+
+    <div class="post-paging" style="display: none;">
+    
+    <a href="/2022/04/24/browser-cache/">
+        <div class="post-paging-last">
+            <span>上一篇</span>
+            <p>浏览器缓存</p>
+        </div>
+    </a>
+    
+
+    
+    <a href="/2020/11/02/npm-install/">
+        <div class="post-paging-next">
+            <span>下一篇</span>
+            <p>npm install 原理</p>
+        </div>
+    </a>
+    
+</div>
+</div>
+		
+<div class="footer">
+	<div class="Copyright">
+		©2023 By Jia
+	</div>
+	<div class="contact">
+		
+		<a href="">
+			<img src="/image/logo.png" alt="Quiet主题">
+		</a>
+		
+	</div>
+</div>
+
+<script src="/js/gotop.js"></script>
+
+
+<style type="text/css">
+    @media screen and (min-width: 600px) {
+        .goTop>span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            opacity: 0.8;
+            background: rgba(18, 24, 58, 0.06);
+            text-align: center;
+            transition: border .5s;
+            border: 1px solid rgba(18, 24, 58, 0.06);
+
+            -moz-transition: border .5s;
+            /* Firefox 4 */
+            -webkit-transition: border .5s;
+            /* Safari 和 Chrome */
+            -o-transition: border .5s;
+            /* Opera */
+        }
+
+        .goTop>span:hover {
+            border: 1px solid #6680B3;
+        }
+
+
+        .goTop {
+            position: fixed;
+            right: 30px;
+            bottom: 80px;
+        }
+
+        .goTop>span>svg {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+        }
+
+    }
+
+    @media screen and (max-width: 600px) {
+        .goTop {
+            display: none;
+        }
+    }
+</style>
+<div class="goTop" id="js-go_top">
+    <span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <g>
+                <path d="M13 12v8h-2v-8H4l8-8 8 8z"></path>
+            </g>
+        </svg>
+    </span>
+</div>
+<script>
+    $( '#js-go_top' )
+	.gotoTop( {
+		offset: 500,
+		speed: 300,
+		animationShow: {
+			'transform': 'translate(0,0)',
+			'transition': 'transform .5s ease-in-out'
+		},
+		animationHide: {
+			'transform': 'translate(100px,0)',
+			'transition': 'transform .5s ease-in-out'
+		}
+	} );
+</script>
+
+
+    <!-- Gitalk -->
+    <script>
+        const data = '{"clientID":"02b3c","clientSecret":"adfc7b4","repo":"gimment","owner":"duneng","admin":"duneng"}'
+        const gitalk = new Gitalk({
+            ...JSON.parse( data),
+            id:location.pathname,
+            distractionFreeMode:false
+        })
+        
+        if(Boolean('false')){
+            gitalk.render('gitalk-container')
+        }
+    </script>
+
+<script>
+	console.log('\n %c Hexo-Quiet 主题 %c https://github.com/79e/hexo-theme-quiet \n', 'color: #fadfa3; background: #030307; padding:5px 0;', 'background: #fadfa3; padding:5px 0;')
+</script>
+	</body>
+</html>
+

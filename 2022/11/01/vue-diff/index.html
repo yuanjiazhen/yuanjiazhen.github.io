@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		
+<title>Vue Diff-Jia</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="shortcut icon" type="image/x-icon" href="/image/favicon.ico">
+
+<link rel="stylesheet" href="/css/index.css">
+
+
+
+<meta name="keywords" content="vue,vue diff,">
+<meta name="description" content="">
+
+
+<script src="/js/jquery.min.js"></script>
+
+
+<script src="/js/index.js"></script>
+
+
+<script src="/js/fancybox.umd.js"></script>
+
+
+<script src="/js/fancybox-images.js"></script>
+
+
+<script src="/js/gitalk.min.js"></script>
+
+
+<script src="/js/hljs.min.js"></script>
+ 
+<script>hljs.highlightAll();</script>
+
+	<meta name="generator" content="Hexo 5.4.2"></head>
+
+	<body>
+		
+	<div class="header">
+		<div class="header-top" id="header-top">
+			<div class="h-left">
+				<a href="/">
+					<img src="/image/logo.png" alt="Quiet">
+				</a>
+			</div>
+			<div class="h-right">
+				<ul>
+					
+						
+								<li>
+									<a href="/">
+										ARTICLE
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+				</ul>
+			</div>
+			<div class="h-right-close">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+					<path fill="none" d="M0 0h24v24H0z" />
+					<path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z" fill="rgba(68,68,68,1)" />
+				</svg>
+			</div>
+		</div>
+	</div>
+	<div class="sidebar">
+    <div class="topo">
+        <h2>Jia</h2>
+    </div>
+    <ul>
+        
+        <li>
+            <a href="/">ARTICLE</a>
+        </li>
+        
+    </ul>
+    <div class="my_foot">
+        
+        <a href="">
+            <img src="/image/logo.png" alt="Quiet主题">
+        </a>
+        
+    </div>
+</div>
+<div class='shelter'>
+</div>
+<style>
+    .shelter{
+        background-color: #333;
+        opacity:0.5;
+        cursor: pointer;
+        display: none; 
+        position: fixed;
+        left: 0;
+        top: 0; 
+        right: 0;
+        bottom: 0;
+        z-index: 1998;
+    }
+    .sidebar {
+        width: 66%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        bottom: 0;
+        background: #fff;
+        z-index: 1999;
+        text-align: center;
+        box-shadow: -6px 0 20px rgba(98, 94, 94, .815);
+    }
+
+    .topo {
+        width: 100%;
+        height: 200px;
+        background: url(https://api.ixiaowai.cn/gqapi/gqapi.php) no-repeat;
+        background-size: 100% 100%;
+        position: relative;
+        display: flex;
+        align-items: flex-end
+    }
+
+    .topo h2 {
+        color: #fff;
+        z-index: 1;
+        position: relative;
+        margin: 0 0 10px 10px;
+        font-size: 1.2em;
+        box-sizing: border-box
+    }
+
+    .topo:before {
+        content: '';
+        background-image: url(/image/pattern.png);
+        background-repeat: repeat;
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        z-index: 1
+    }
+
+    .sidebar ul {
+        width: 100%;
+        margin-top: 50px
+    }
+
+    .sidebar ul li {
+        height: 50px;
+        list-style: none;
+        font-size: 1.2em;
+        text-align: right;
+        margin-right: 10px
+    }
+
+    .sidebar ul li a {
+        display: grid;
+        color: #5d606a;
+        text-overflow: ellipsis;
+        width: 100%;
+        text-decoration: none
+    }
+
+    .my_foot {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        position: absolute;
+        bottom: 0
+    }
+
+    .my_foot a {
+        text-decoration: none;
+        margin-right: 10px;
+        display: inline-block
+    }
+
+    .my_foot a img {
+        width: 30px;
+        height: 30px
+    }
+</style>
+
+<script>
+    $( function () {
+	$( '.h-right-close>svg' )
+		.click( function () {
+			$( '.sidebar' )
+				.animate( {
+					right: "0"
+				}, 500 );
+			$( '.shelter' )
+				.fadeIn( "slow" )
+		} );
+	$( '.shelter' )
+		.click( function ( e ) {
+			$( '.sidebar' )
+				.animate( {
+					right: "-100%"
+				}, 500 );
+			$( '.shelter' )
+				.fadeOut( "slow" )
+		} )
+} )
+
+</script>
+
+<div class="post">
+    <div class="post-header-background post-header-img">
+<!-- style="background: url('https://api.ixiaowai.cn/gqapi/gqapi.php')" -->
+    <div class="post-header-background-content">
+        <ul class="post-header-tag">
+            
+            
+            <li><a href="/tags/vue">vue</a></li>
+            
+            <li><a href="/tags/vue diff">vue diff</a></li>
+            
+            
+        </ul>
+        
+        <h1>Vue Diff</h1>
+        <div class="post-header-info">
+            <div class="post-header-info-author">
+                
+                    <svg t="1604839279282" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                        xmlns="http://www.w3.org/2000/svg" p-id="2901" width="20" height="20">
+                        <path
+                            d="M513 956.3c-247.7 0-448-200.3-448-448S265.3 66.2 513 66.2s448 200.3 448 448-200.3 442.1-448 442.1z m0-830.9c-212.2 0-388.8 170.7-388.8 388.8C124.2 726.3 294.9 903 513 903c212.2 0 388.8-170.7 388.8-388.8S725.2 125.4 513 125.4z m0 430.2c-94.2 0-170.7-76.5-170.7-170.7S418.8 207.8 513 207.8s170.7 76.5 170.7 170.7S607.2 555.6 513 555.6z m0-289.1c-64.6 0-112 52.8-112 112s47.4 117.9 112 117.9 112-52.8 112-112-47.4-117.9-112-117.9z m0 689.8c-135.7 0-259-58.7-341.9-158.9l-11.8-17.8 11.8-17.8c76.5-117.9 206.2-188.5 347.8-188.5 135.7 0 265 64.6 341.9 182.6l11.8 17.8-11.8 17.8C778 897.1 648.7 956.3 513 956.3zM230.3 773.2C300.9 849.7 406.9 897 513 897c112 0 218.1-47.4 288.6-129.8-70.5-88.2-170.7-135.6-282.7-135.6s-218.1 53.3-288.6 141.6z"
+                            p-id="2902" fill="#ffffff"></path>
+                    </svg>
+                    
+                <span class="post-header-info-author-text"> <a href="../../about">Jia</a></span>
+                <!-- <div class="post-header-info-author-categories">
+                    
+                         <a href="../../categories/vue/" target="_blank" >vue</a>
+                    
+                </div> -->
+                <p>2022-11-01 20:53:11</p>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="post-content" id="content">
+  
+  <div id="article" class="post-content-info">
+    
+
+    <h2 id="简单Diff"><a href="#简单Diff" class="headerlink" title="简单Diff"></a>简单Diff</h2><p>由于操作 DOM 的性能开销是比较大的，所以就出现了 Diff 算法。Diff 算法通过对比新旧 vnode 节点，找出需更新的节点，定向更新。使用 Diff 比较两个节点的时候，只会进行同层比较</p>
+<p>以下面新旧节点为例</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 旧 vnode</span></span><br><span class="line"><span class="keyword">const</span> oldVNode = &#123;</span><br><span class="line">  <span class="attr">type</span>: <span class="string">&#x27;div&#x27;</span>,</span><br><span class="line">  <span class="attr">children</span>: [</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;1&#x27;</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;2&#x27;</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;3&#x27;</span> &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 新 vnode</span></span><br><span class="line"><span class="keyword">const</span> newVNode = &#123;</span><br><span class="line">  <span class="attr">type</span>: <span class="string">&#x27;div&#x27;</span>,</span><br><span class="line">  <span class="attr">children</span>: [</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;4&#x27;</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;5&#x27;</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;6&#x27;</span> &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>没使用 Diff 时，需要执行 6 次 DOM 操作：</p>
+<ul>
+<li>3次 DOM 删除操作，卸载所有节点</li>
+<li>3次 DOM 新增操作，挂载所有节点</li>
+</ul>
+<p>观察发现，新旧 vnode 都是 p 标签，只有 p 标签的子节点（文本节点）发生了变化，使用了 Diff 操作后，只需要执行 3 次 DOM 操作</p>
+<ul>
+<li>3次 DOM 文本节点更新操作，更新所有文本节点</li>
+</ul>
+<img src="img-0.jpg" width=100% height=300 alt=alt />
+
+<p>代码简单实现如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">patchChildren</span>(<span class="params">n1, n2, container</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> n2.<span class="property">children</span> === <span class="string">&#x27;string&#x27;</span>) &#123;</span><br><span class="line">    <span class="comment">// 省略</span></span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="title class_">Array</span>.<span class="title function_">isArray</span>(n2.<span class="property">children</span>)) &#123;</span><br><span class="line">    <span class="keyword">const</span> oldChildren = n1.<span class="property">children</span>;</span><br><span class="line">    <span class="keyword">const</span> newChildren = n2.<span class="property">children</span>;</span><br><span class="line">    <span class="keyword">const</span> oldLen = oldChildren.<span class="property">length</span>;</span><br><span class="line">    <span class="keyword">const</span> newLen = newChildren.<span class="property">length</span>;</span><br><span class="line">    <span class="comment">// 两组子节点的公共长度，即两者中较短的那一组子节点的长度</span></span><br><span class="line">    <span class="keyword">const</span> commonLength = <span class="title class_">Math</span>.<span class="title function_">min</span>(oldLen, newLen);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; commonLength; i++) &#123;</span><br><span class="line">      <span class="comment">// 新旧节点逐一diff</span></span><br><span class="line">      <span class="title function_">patch</span>(oldChildren[i], newChildren[i], container);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (newLen &gt; oldLen) &#123;</span><br><span class="line">      <span class="comment">// 新节点数量大于旧节点，说明有新增节点</span></span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">let</span> i = commonLength; i &lt; newLen; i++) &#123;</span><br><span class="line">        <span class="title function_">patch</span>(<span class="literal">null</span>, newChildren[i], container);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (oldLen &gt; newLen) &#123;</span><br><span class="line">      <span class="comment">// 旧节点大于新节点数量，说明有需要卸载的旧节点</span></span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">let</span> i = commonLength; i &lt; oldLen; i++) &#123;</span><br><span class="line">        <span class="title function_">unmount</span>(oldChildren[i]);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 省略</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="通过key复用节点"><a href="#通过key复用节点" class="headerlink" title="通过key复用节点"></a>通过key复用节点</h3><p>当一个节点的 key 和 tag 都相同的时候，我们就认为这个节点可以复用。节点可复用代表 DOM 元素可复用，不意味着就不需要更新（可能出现文本节点更新，或节点移动情况）</p>
+<p>以下面新旧节点为例：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> oldVNode = &#123;</span><br><span class="line">  <span class="attr">type</span>: <span class="string">&#x27;div&#x27;</span>,</span><br><span class="line">  <span class="attr">children</span>: [</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;p-1&#x27;</span>, <span class="attr">key</span>: <span class="number">1</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;p-2&#x27;</span>, <span class="attr">key</span>: <span class="number">2</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;p-3&#x27;</span>, <span class="attr">key</span>: <span class="number">3</span> &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> newVNode = &#123;</span><br><span class="line">  <span class="attr">type</span>: <span class="string">&#x27;div&#x27;</span>,</span><br><span class="line">  <span class="attr">children</span>: [</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;p-3&#x27;</span>, <span class="attr">key</span>: <span class="number">3</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;p-1&#x27;</span>, <span class="attr">key</span>: <span class="number">1</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;p-2&#x27;</span>, <span class="attr">key</span>: <span class="number">2</span> &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对比新旧节点发现只需移动 <code>key:1 和 key:2</code>位置即可，相关 DOM 均可复用</p>
+<img src="img-1.jpg" width=100% height=200 alt=alt />
+
+<p>diff 过程如下</p>
+<ol>
+<li>取新节点第一个节点 p-3，key 为 3，在旧节点中可找到对应 key 值节点，索引为 2，节点复用，标记 <code>lastIndex=2</code></li>
+<li>取新节点第二个节点 p-1，key 为 1，在旧节点中可找到对应 key 值节点，索引为 0，节点复用，因<code>索引 0&lt;lastIndex=2</code>，打破索引递增顺序，标记 p-1 需移动，无需更新 lastIndex 值</li>
+<li>取新节点第三个节点 p-2，key 为 2，在旧节点中可找到对应 key 值节点，索引为 1，节点复用，因<code>索引 1&lt;lastIndex=2</code>，打破索引递增顺序，标记 p-2 需移动，无需更新 lastIndex 值</li>
+</ol>
+<p>实现代码如下：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">patchChildren</span>(<span class="params">n1, n2, container</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> n2.<span class="property">children</span> === <span class="string">&#x27;string&#x27;</span>) &#123;</span><br><span class="line">    <span class="comment">// 省略部分代码</span></span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="title class_">Array</span>.<span class="title function_">isArray</span>(n2.<span class="property">children</span>)) &#123;</span><br><span class="line">    <span class="keyword">const</span> oldChildren = n1.<span class="property">children</span></span><br><span class="line">    <span class="keyword">const</span> newChildren = n2.<span class="property">children</span></span><br><span class="line">    <span class="comment">// 用来存储寻找过程中遇到的最大索引值</span></span><br><span class="line">    <span class="keyword">let</span> lastIndex = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; newChildren.<span class="property">length</span>; i++) &#123;</span><br><span class="line">      <span class="keyword">const</span> newVNode = newChildren[i]</span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">let</span> j = <span class="number">0</span>; j &lt; oldChildren.<span class="property">length</span>; j++) &#123;</span><br><span class="line">        <span class="keyword">const</span> oldVNode = oldChildren[j]</span><br><span class="line">        <span class="keyword">if</span> (newVNode.<span class="property">key</span> === oldVNode.<span class="property">key</span>) &#123;</span><br><span class="line">          <span class="title function_">patch</span>(oldVNode, newVNode, container)</span><br><span class="line">          <span class="keyword">if</span> (j &lt; lastIndex) &#123;</span><br><span class="line">            <span class="comment">// 如果当前找到的节点在旧 children 中的索引小于最大索引值 lastIndex</span></span><br><span class="line">            <span class="comment">// 说明该节点对应的真实 DOM 需要移动</span></span><br><span class="line">            <span class="keyword">const</span> prevVNode = newChildren[i - <span class="number">1</span>]</span><br><span class="line">            <span class="comment">// 如果 prevVNode 不存在，说明 newVNode 是第一个节点，不需要移动</span></span><br><span class="line">            <span class="keyword">if</span> (prevVNode) &#123;</span><br><span class="line">              <span class="keyword">const</span> anchor = prevVNode.<span class="property">el</span>.<span class="property">nextSibling</span></span><br><span class="line">              <span class="comment">// 将 newVNode 插入到 anchor 前面</span></span><br><span class="line">              <span class="title function_">insert</span>(newVNode.<span class="property">el</span>, container, anchor)</span><br><span class="line">            &#125;</span><br><span class="line">          &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 如果当前找到的节点在旧 children 中的索引不小于最大索引值，</span></span><br><span class="line">            <span class="comment">// 则更新 lastIndex 的值</span></span><br><span class="line">            lastIndex = j</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">break</span> <span class="comment">// 这里需要 break</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 省略部分代码</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// inset 函数</span></span><br><span class="line">  <span class="title function_">insert</span>(<span class="params">el, parent, anchor = <span class="literal">null</span></span>) &#123;</span><br><span class="line">    parent.<span class="title function_">insertBefore</span>(el, anchor)</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="双端Diff"><a href="#双端Diff" class="headerlink" title="双端Diff"></a>双端Diff</h2><p>双端 Diff 是 vue2 使用的， Diff 算法过程如下：</p>
+<ol>
+<li>给四个指针赋值：<code>newStartIdx=new p-4</code> <code>newEndIdx=new p-3</code> <code>oldStartIdx=old p-1</code> <code>oldEndIdx=old p-4</code>，初始状态如下图，开始第一轮 Diff<ul>
+<li>newStartIdx 和 oldStartIdx 对比：key 不同，不可复用，不处理</li>
+<li>newEndIdx 和 oldEndIdx 对比：key 不同，不可复用，不处理</li>
+<li>newEndIdx 和 oldStartIdx 对比：key 不同，不可复用，不处理</li>
+<li>newStartIdx 和 oldEndIdx 对比：key 相同，复用，移动 p-4 DOM 节点，<code>newStartIdx=p-2</code> <code>oldEndIdx=p-3</code></li>
+</ul>
+</li>
+</ol>
+<img src="img-2.jpg" width=100% height=300 alt=alt />
+
+<ol start="2">
+<li>第一轮 Diff 结束如下图，开始第二轮 Diff<ul>
+<li>newStartIdx 和 oldStartIdx 对比：key 不同，不可复用，不处理</li>
+<li>newEndIdx 和 oldEndIdx 对比：key 相同，复用，位置相同，无需移动 <code>newEndIdx=p-1</code> <code>oldEndIdx=p-2</code></li>
+</ul>
+</li>
+</ol>
+<img src="img-3.jpg" width=100% height=300 alt=alt />
+
+<ol start="3">
+<li>第二轮 Diff 结束如下图，开始第三轮 Diff<ul>
+<li>newStartIdx 和 oldStartIdx 对比：key 不同，不可复用，不处理</li>
+<li>newEndIdx 和 oldEndIdx 对比：key 不同，不可复用，不处理</li>
+<li>newEndIdx 和 oldStartIdx 对比：key 相同，复用，移动 p-1 DOM 节点，<code>newEndIdx=p-2</code> <code>oldStartIdx=p-2</code></li>
+</ul>
+</li>
+</ol>
+<img src="img-4.jpg" width=100% height=300 alt=alt />
+
+<ol start="4">
+<li>第三轮 Diff 结束如下图，开始第四轮 Diff<ul>
+<li>newStartIdx 和 oldStartIdx 对比：key 相同，复用，无需移动，<code>newEndIdx=p-4</code>  <code>oldStartIdx=p-3</code></li>
+</ul>
+</li>
+</ol>
+<img src="img-5.jpg" width=100% height=350 alt=alt />
+
+<ol start="5">
+<li>第四轮 Diff 结束如下图，此时 <code>newStartIdx &gt; newEndIdx</code> <code>oldStartIdx &gt; oldEndIdx</code>跳出循环，结束 Diff</li>
+</ol>
+<img src="img-6.jpg" width=100% height=300 alt=alt />
+
+<p>双端 Diff 算法对比简单 Diff 算法优势在于对于同样的更新场景，执行的 DOM 移动操作次数更少，如上述例子，使用双端 Diff 需移动 2 次 DOM，但使用简单 Diff 则需移动 3 次 DOM，如下图</p>
+<img src="img-7.jpg" width=100% height=400 alt=alt />
+
+<h2 id="快速Diff"><a href="#快速Diff" class="headerlink" title="快速Diff"></a>快速Diff</h2><p> vue3 使用快速 Diff 算法，快速 Diff 算法包含了预处理步骤，预处理是借鉴了纯文本 Diff 算法思路：</p>
+<ol>
+<li>两段文本 Diff 之前，先进行全等比较，如果全等，无需进入 Diff：<code>if (text1 === text2) return</code></li>
+<li>预处理时还会处理两段文本相同的前后缀，对于相同的前后缀，无需进入 Diff</li>
+</ol>
+<img src="img-8.jpg" width=100% height=100 alt=alt />
+
+<p>预处理节点过程：</p>
+<ol>
+<li>建立新旧节点头索引从前向后遍历，直至遍历到不同节点，停止</li>
+<li>建立新旧节点尾索引从后向前遍历，直至遍历到不同节点，停止</li>
+</ol>
+<img src="img-9.jpg" width=100% height=300 alt=alt />
+
+<ol start="3">
+<li>遍历完我们发现：<ul>
+<li><code>oldEnd &lt; j</code>，说明预处理过程中，所有旧节点都处理完</li>
+<li><code>newEnd &gt;= j</code>，说明预处理过程中，存在未处理完的新节点，这些遗留的新节点视为<strong>新增节点</strong>，需要执行挂载处理</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">patchKeyedChildren</span>(<span class="params">n1, n2, container</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> newChildren = n2.<span class="property">children</span></span><br><span class="line">  <span class="keyword">const</span> oldChildren = n1.<span class="property">children</span></span><br><span class="line">  <span class="comment">// 处理相同的前置节点，索引 j 指向新旧两组子节点的开头</span></span><br><span class="line">  <span class="keyword">let</span> j = <span class="number">0</span></span><br><span class="line">  <span class="keyword">let</span> oldVNode = oldChildren[j]</span><br><span class="line">  <span class="keyword">let</span> newVNode = newChildren[j]</span><br><span class="line">  <span class="comment">// while 循环向后遍历，直到遇到拥有不同 key 值的节点为止</span></span><br><span class="line">  <span class="keyword">while</span> (oldVNode.<span class="property">key</span> === newVNode.<span class="property">key</span>) &#123;</span><br><span class="line">    <span class="comment">// 调用 patch 函数进行更新</span></span><br><span class="line">    <span class="title function_">patch</span>(oldVNode, newVNode, container)</span><br><span class="line">    <span class="comment">// 更新索引 j，让其递增</span></span><br><span class="line">    j++</span><br><span class="line">    oldVNode = oldChildren[j]</span><br><span class="line">    newVNode = newChildren[j]</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 更新相同的后置节点，索引 oldEnd 指向旧的一组子节点的最后一个节点</span></span><br><span class="line">  <span class="keyword">let</span> oldEnd = oldChildren.<span class="property">length</span> - <span class="number">1</span></span><br><span class="line">  <span class="comment">// 索引 newEnd 指向新的一组子节点的最后一个节点</span></span><br><span class="line">  <span class="keyword">let</span> newEnd = newChildren.<span class="property">length</span> - <span class="number">1</span></span><br><span class="line">  oldVNode = oldChildren[oldEnd]</span><br><span class="line">  newVNode = newChildren[newEnd]</span><br><span class="line">  <span class="comment">// while 循环从后向前遍历，直到遇到拥有不同 key 值的节点为止</span></span><br><span class="line">  <span class="keyword">while</span> (oldVNode.<span class="property">key</span> === newVNode.<span class="property">key</span>) &#123;</span><br><span class="line">    <span class="comment">// 调用 patch 函数进行更新</span></span><br><span class="line">    <span class="title function_">patch</span>(oldVNode, newVNode, container)</span><br><span class="line">    <span class="comment">// 递减 oldEnd 和 nextEnd</span></span><br><span class="line">    oldEnd--</span><br><span class="line">    newEnd--</span><br><span class="line">    oldVNode = oldChildren[oldEnd]</span><br><span class="line">    newVNode = newChildren[newEnd]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果回到预处理步骤 3，遍历完发现：</p>
+<ul>
+<li><code>oldEnd &gt;= j</code>，说明预处理过程中，存在未处理完的旧节点，这些遗留的旧节点视为<strong>删除节点</strong>，需要执行卸载处理 </li>
+<li><code>newEnd &lt; j</code>，说明预处理过程中，所有新节点都处理完</li>
+</ul>
+<img src="img-10.jpg" width=100% height=250 alt=alt />
+
+<p>如果回到预处理步骤 3，遍历完发现：</p>
+<ul>
+<li><code>oldEnd &gt;= j</code>，说明预处理过程中，存在未处理完的旧节点</li>
+<li><code>newEnd &gt;= j</code>，说明预处理过程中，存在未处理完的新节点</li>
+<li>新旧节点都有剩余，则需对这部分节点进行 Diff，我们可以构造一个 source 数组来存储预处理后剩余的节点，并且 source 中每个元素的初始值都是 -1，来辅助完成 DOM 移动操作</li>
+</ul>
+<img src="img-11.jpg" width=100% height=400 alt=alt />
+
+
+<ul>
+<li>填充 source 数组值：取新节点在旧节点对应的索引值，找不到对应节点就不处理，填充完如下：</li>
+</ul>
+<img src="img-12.jpg" width=100% height=400 alt=alt />
+
+<ul>
+<li>填充完 source 数组值后，采用简单 Diff 逻辑对 source 数组中节点进行 Diff</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>《Vue.js 设计与实现》</p>
+
+  </div>
+  <div id=""></div>
+</div>
+
+<script>
+  
+Fancybox.bind('[data-fancybox="fancybox-gallery-img"]', {
+  dragToClose: true,
+  Toolbar: true,
+  closeButton: "top",
+  Image: {
+    zoom: true,
+  },
+  on: {
+    initCarousel: (fancybox) => {
+      const slide = fancybox.Carousel.slides[fancybox.Carousel.page];
+      fancybox.$container.style.setProperty(
+        "--bg-image",
+        `url("${slide.$thumb.src}")`
+      );
+    },
+    "Carousel.change": (fancybox, carousel, to, from) => {
+      const slide = carousel.slides[to];
+      fancybox.$container.style.setProperty(
+        "--bg-image",
+        `url("${slide.$thumb.src}")`
+      );
+    },
+  },
+});
+</script>
+
+<style>
+    #noneimg img {
+        display: none;
+        z-index: 9999;
+        /* width: 600px !important; */
+        min-width: 0%;
+        max-width: 90%;
+        max-height: 80%;
+        border-radius: 0px;
+        position: fixed;
+        box-shadow: 0 0 0px #c3c3c300 !important;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto !important;
+    }
+
+    @media screen and (max-width:600px) {
+        #noneimg img {
+            max-width: 88%
+        }
+    }
+</style>
+
+    <div class="post-paging" style="display: none;">
+    
+    <a href="/2022/11/10/vue-response-system/">
+        <div class="post-paging-last">
+            <span>上一篇</span>
+            <p>Vue 响应式系统</p>
+        </div>
+    </a>
+    
+
+    
+    <a href="/2022/09/20/handwritten-redux/">
+        <div class="post-paging-next">
+            <span>下一篇</span>
+            <p>Redux 基本实现</p>
+        </div>
+    </a>
+    
+</div>
+</div>
+		
+<div class="footer">
+	<div class="Copyright">
+		©2023 By Jia
+	</div>
+	<div class="contact">
+		
+		<a href="">
+			<img src="/image/logo.png" alt="Quiet主题">
+		</a>
+		
+	</div>
+</div>
+
+<script src="/js/gotop.js"></script>
+
+
+<style type="text/css">
+    @media screen and (min-width: 600px) {
+        .goTop>span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            opacity: 0.8;
+            background: rgba(18, 24, 58, 0.06);
+            text-align: center;
+            transition: border .5s;
+            border: 1px solid rgba(18, 24, 58, 0.06);
+
+            -moz-transition: border .5s;
+            /* Firefox 4 */
+            -webkit-transition: border .5s;
+            /* Safari 和 Chrome */
+            -o-transition: border .5s;
+            /* Opera */
+        }
+
+        .goTop>span:hover {
+            border: 1px solid #6680B3;
+        }
+
+
+        .goTop {
+            position: fixed;
+            right: 30px;
+            bottom: 80px;
+        }
+
+        .goTop>span>svg {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+        }
+
+    }
+
+    @media screen and (max-width: 600px) {
+        .goTop {
+            display: none;
+        }
+    }
+</style>
+<div class="goTop" id="js-go_top">
+    <span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <g>
+                <path d="M13 12v8h-2v-8H4l8-8 8 8z"></path>
+            </g>
+        </svg>
+    </span>
+</div>
+<script>
+    $( '#js-go_top' )
+	.gotoTop( {
+		offset: 500,
+		speed: 300,
+		animationShow: {
+			'transform': 'translate(0,0)',
+			'transition': 'transform .5s ease-in-out'
+		},
+		animationHide: {
+			'transform': 'translate(100px,0)',
+			'transition': 'transform .5s ease-in-out'
+		}
+	} );
+</script>
+
+
+    <!-- Gitalk -->
+    <script>
+        const data = '{"clientID":"02b3c","clientSecret":"adfc7b4","repo":"gimment","owner":"duneng","admin":"duneng"}'
+        const gitalk = new Gitalk({
+            ...JSON.parse( data),
+            id:location.pathname,
+            distractionFreeMode:false
+        })
+        
+        if(Boolean('false')){
+            gitalk.render('gitalk-container')
+        }
+    </script>
+
+<script>
+	console.log('\n %c Hexo-Quiet 主题 %c https://github.com/79e/hexo-theme-quiet \n', 'color: #fadfa3; background: #030307; padding:5px 0;', 'background: #fadfa3; padding:5px 0;')
+</script>
+	</body>
+</html>
+

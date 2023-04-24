@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		
+<title>浏览器缓存-Jia</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="shortcut icon" type="image/x-icon" href="/image/favicon.ico">
+
+<link rel="stylesheet" href="/css/index.css">
+
+
+
+<meta name="keywords" content="缓存,浏览器,">
+<meta name="description" content="">
+
+
+<script src="/js/jquery.min.js"></script>
+
+
+<script src="/js/index.js"></script>
+
+
+<script src="/js/fancybox.umd.js"></script>
+
+
+<script src="/js/fancybox-images.js"></script>
+
+
+<script src="/js/gitalk.min.js"></script>
+
+
+<script src="/js/hljs.min.js"></script>
+ 
+<script>hljs.highlightAll();</script>
+
+	<meta name="generator" content="Hexo 5.4.2"></head>
+
+	<body>
+		
+	<div class="header">
+		<div class="header-top" id="header-top">
+			<div class="h-left">
+				<a href="/">
+					<img src="/image/logo.png" alt="Quiet">
+				</a>
+			</div>
+			<div class="h-right">
+				<ul>
+					
+						
+								<li>
+									<a href="/">
+										ARTICLE
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+				</ul>
+			</div>
+			<div class="h-right-close">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+					<path fill="none" d="M0 0h24v24H0z" />
+					<path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z" fill="rgba(68,68,68,1)" />
+				</svg>
+			</div>
+		</div>
+	</div>
+	<div class="sidebar">
+    <div class="topo">
+        <h2>Jia</h2>
+    </div>
+    <ul>
+        
+        <li>
+            <a href="/">ARTICLE</a>
+        </li>
+        
+    </ul>
+    <div class="my_foot">
+        
+        <a href="">
+            <img src="/image/logo.png" alt="Quiet主题">
+        </a>
+        
+    </div>
+</div>
+<div class='shelter'>
+</div>
+<style>
+    .shelter{
+        background-color: #333;
+        opacity:0.5;
+        cursor: pointer;
+        display: none; 
+        position: fixed;
+        left: 0;
+        top: 0; 
+        right: 0;
+        bottom: 0;
+        z-index: 1998;
+    }
+    .sidebar {
+        width: 66%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        bottom: 0;
+        background: #fff;
+        z-index: 1999;
+        text-align: center;
+        box-shadow: -6px 0 20px rgba(98, 94, 94, .815);
+    }
+
+    .topo {
+        width: 100%;
+        height: 200px;
+        background: url(https://api.ixiaowai.cn/gqapi/gqapi.php) no-repeat;
+        background-size: 100% 100%;
+        position: relative;
+        display: flex;
+        align-items: flex-end
+    }
+
+    .topo h2 {
+        color: #fff;
+        z-index: 1;
+        position: relative;
+        margin: 0 0 10px 10px;
+        font-size: 1.2em;
+        box-sizing: border-box
+    }
+
+    .topo:before {
+        content: '';
+        background-image: url(/image/pattern.png);
+        background-repeat: repeat;
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        z-index: 1
+    }
+
+    .sidebar ul {
+        width: 100%;
+        margin-top: 50px
+    }
+
+    .sidebar ul li {
+        height: 50px;
+        list-style: none;
+        font-size: 1.2em;
+        text-align: right;
+        margin-right: 10px
+    }
+
+    .sidebar ul li a {
+        display: grid;
+        color: #5d606a;
+        text-overflow: ellipsis;
+        width: 100%;
+        text-decoration: none
+    }
+
+    .my_foot {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        position: absolute;
+        bottom: 0
+    }
+
+    .my_foot a {
+        text-decoration: none;
+        margin-right: 10px;
+        display: inline-block
+    }
+
+    .my_foot a img {
+        width: 30px;
+        height: 30px
+    }
+</style>
+
+<script>
+    $( function () {
+	$( '.h-right-close>svg' )
+		.click( function () {
+			$( '.sidebar' )
+				.animate( {
+					right: "0"
+				}, 500 );
+			$( '.shelter' )
+				.fadeIn( "slow" )
+		} );
+	$( '.shelter' )
+		.click( function ( e ) {
+			$( '.sidebar' )
+				.animate( {
+					right: "-100%"
+				}, 500 );
+			$( '.shelter' )
+				.fadeOut( "slow" )
+		} )
+} )
+
+</script>
+
+<div class="post">
+    <div class="post-header-background post-header-img">
+<!-- style="background: url('https://api.ixiaowai.cn/gqapi/gqapi.php')" -->
+    <div class="post-header-background-content">
+        <ul class="post-header-tag">
+            
+            
+            <li><a href="/tags/缓存">缓存</a></li>
+            
+            <li><a href="/tags/浏览器">浏览器</a></li>
+            
+            
+        </ul>
+        
+        <h1>浏览器缓存</h1>
+        <div class="post-header-info">
+            <div class="post-header-info-author">
+                
+                    <svg t="1604839279282" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                        xmlns="http://www.w3.org/2000/svg" p-id="2901" width="20" height="20">
+                        <path
+                            d="M513 956.3c-247.7 0-448-200.3-448-448S265.3 66.2 513 66.2s448 200.3 448 448-200.3 442.1-448 442.1z m0-830.9c-212.2 0-388.8 170.7-388.8 388.8C124.2 726.3 294.9 903 513 903c212.2 0 388.8-170.7 388.8-388.8S725.2 125.4 513 125.4z m0 430.2c-94.2 0-170.7-76.5-170.7-170.7S418.8 207.8 513 207.8s170.7 76.5 170.7 170.7S607.2 555.6 513 555.6z m0-289.1c-64.6 0-112 52.8-112 112s47.4 117.9 112 117.9 112-52.8 112-112-47.4-117.9-112-117.9z m0 689.8c-135.7 0-259-58.7-341.9-158.9l-11.8-17.8 11.8-17.8c76.5-117.9 206.2-188.5 347.8-188.5 135.7 0 265 64.6 341.9 182.6l11.8 17.8-11.8 17.8C778 897.1 648.7 956.3 513 956.3zM230.3 773.2C300.9 849.7 406.9 897 513 897c112 0 218.1-47.4 288.6-129.8-70.5-88.2-170.7-135.6-282.7-135.6s-218.1 53.3-288.6 141.6z"
+                            p-id="2902" fill="#ffffff"></path>
+                    </svg>
+                    
+                <span class="post-header-info-author-text"> <a href="../../about">Jia</a></span>
+                <!-- <div class="post-header-info-author-categories">
+                    
+                         <a href="../../categories/浏览器/" target="_blank" >浏览器</a>
+                    
+                </div> -->
+                <p>2022-04-24 18:53:11</p>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="post-content" id="content">
+  
+  <div id="article" class="post-content-info">
+    
+
+    <h2 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h2><p>浏览器缓存作用如下：</p>
+<ul>
+<li>减少多余的数据传输</li>
+<li>减轻服务端的负担</li>
+<li>加快客户端加载网页的速度，提升用户体验</li>
+</ul>
+<h2 id="缓存流程"><a href="#缓存流程" class="headerlink" title="缓存流程"></a>缓存流程</h2><img src="img-1.png" width=100% height=300 alt=alt />
+
+<h2 id="DNS-缓存"><a href="#DNS-缓存" class="headerlink" title="DNS 缓存"></a>DNS 缓存</h2><p>DNS 解析：根据域名查找到真实 IP 地址的过程<code>www.dnscache.com（域名）--&gt; DNS 解析 --&gt; 11.222.33.444（IP 地址）</code><br>DNS 缓存：浏览器在第一次获取到某域名的 IP 地址后，会缓存起来，供下次查找域名时使用<br>DNS 查找过程：</p>
+<img src="img-2.png" width=100% height=400 alt=alt />
+
+<h2 id="本地缓存"><a href="#本地缓存" class="headerlink" title="本地缓存"></a>本地缓存</h2><p>本地缓存（memory cache）是浏览器为了加快读取缓存速度而进行的自身的优化行为，不受开发者控制和 HTTP 协议头约束。关闭页面就释放资源</p>
+<p>几乎所有网络资源都会放入本地缓存，数据量大，在网页未关闭时也可能会失效</p>
+<h2 id="HTTP-缓存"><a href="#HTTP-缓存" class="headerlink" title="HTTP 缓存"></a>HTTP 缓存</h2><p>HTTP 缓存分为强缓存和协商缓存，强缓存优先级大于协商缓存<br>缓存使用场景：图片、不常变化 JS、顶部导航栏、埋点 SDK等</p>
+<h3 id="强缓存"><a href="#强缓存" class="headerlink" title="强缓存"></a>强缓存</h3><p>强缓存是指向浏览器查找请求结果，并根据结果的缓存规则来决定是否使用该缓存（由浏览器确定缓存资源是否可用）<br>强缓存是通过 HTTP 请求头的<code>Pragma</code>、<code>Cache-Control</code>和<code>Expires</code>来控制的，优先级：<code>Pragma &gt; Cache-Control &gt; Expires</code></p>
+<p>Pragma:no-cache：等同于<code>Cache-Control: no-cache</code><br>Cache-Control：HTTP 1.1 新增属性，请求头和响应头均可使用，常用属性如下：</p>
+<ul>
+<li>max-age：相对时间，代表资源的有效期，单位 s</li>
+<li>no-cahe：不使用强缓存</li>
+<li>no-store：禁用使用缓存（强缓存和协商缓存），每次都向服务器请求最新资源</li>
+<li>public：共用的，响应可被中间代理、CDN 等缓存</li>
+<li>private：私有的，只用于个人缓存，中间代理、CDN 等不能缓存此响应</li>
+<li>must-revalidate：在缓存过期前可使用，过期后需向服务器验证</li>
+</ul>
+<p>Expires：</p>
+<ul>
+<li>资源过期时间，格式是绝对时间的 GMT 格式的时间字符串，如 <code>expires:Fri, 14 Apr 2017 10:47:02 GMT</code></li>
+<li>由于存在系统时间和服务器时间不一致情况，所以会有缓存有效期不准问题</li>
+<li>浏览器发起请求时，将系统时间和 Expires 值比较，<code>系统时间 &gt; Expires</code>缓存失效</li>
+</ul>
+<h3 id="协商缓存"><a href="#协商缓存" class="headerlink" title="协商缓存"></a>协商缓存</h3><p>协商缓存是指当未命中强缓存后，浏览器会携带缓存标识（Last-Modified/If-Modified-Since、Etag/If-None-Match）向服务器请求资源，服务器根据缓存标识判断是否命中协商缓存（由服务器确定缓存资源是否可用）</p>
+<p>缓存标识是成对出现的，第一次请求响应头带上 Last-Modified 和 Etag，后续请求带上 If-Modified-Since 和 If-None-Match。Etag/If-None-Match 优先级大于 Last-Modified/If-Modified-Since</p>
+<p>Last-Modified: 资源最后更新时间，第一次请求资源随服务器 response 返回<br>If-Modified-Since:</p>
+<ol>
+<li>第二次请求资源时在 request 加上 If-Modified-Since，值为缓存之前的 Last-Modified</li>
+<li>服务器对比 If-modify-since 和 Last-modify 是否相同<ul>
+<li>相同：命中协商缓存，返回 304 Not Modified，无需返回资源内容，response 不添加 Last-Modified。浏览器收到 304 后，直接在缓存中加载资源</li>
+<li>不相同：未命中缓存，返回 200 和资源内容，更新 response 中 Last-Modified</li>
+</ul>
+</li>
+</ol>
+<p>Etag: 资源唯一标识，第一次请求资源随服务器 response 返回，根据文件内容判断是否更新 Etag。<br>If-None-Match:</p>
+<ol>
+<li>第二次请求资源时在 request 加上 If-None-Match，值为之前的 Etag</li>
+<li>服务器对比  If-None-Match 和 Etag 是否相同<ul>
+<li>相同：命中协商缓存，返回 304，更新 Etag（因为 Etag 重新生成了，虽然和之前一样）。浏览器收到 304 后，直接在缓存中加载资源</li>
+<li>不相同：未命中缓存，返回 200 和资源内容，更新 Etag</li>
+</ul>
+</li>
+</ol>
+<p>有了 Last-Modified 为什么还需要 Etag 判断资源是否被修改了？原因如下</p>
+<ol>
+<li>有些文件会周期性修改，但只更新了修改时间，文件内容没变化，此时 Last-Modified  会更新，但缓存资源内容实际是可复用</li>
+<li>有些文件改动过于频繁，Last-Modified 和 If-Modified-Since 已经无法比对到文件是否已修改过了，就需要文件内容来判断</li>
+<li>某些服务器不能精确得到文件最后修改时间</li>
+</ol>
+<img src="img-3.png" width=100%  alt=alt />
+
+<h2 id="CDN-缓存"><a href="#CDN-缓存" class="headerlink" title="CDN 缓存"></a>CDN 缓存</h2><p>CDN（Content Delivery Network 内容分发网络） 是建立并覆盖在承载网之上，由分布在不同区域的边缘节点服务器群组成的分布式网络。比如从广东请求北京服务器的资源，但在广东建立了个北京服务器的资源 CDN 节点，那么就可以该 CDN 节点请求资源，减少了请求路程<br>CDN 使用场景：图片小文件/大文件下载、音视频点播、直播流媒体、全站加速、安全加速<br>CDN 优势：</p>
+<ol>
+<li>使得跨境运营商和跨地域访问延时大幅度降低</li>
+<li>起分流作用，减轻源站负载</li>
+</ol>
+<p>CDN 缺点：会带来 CDN 更新和源站数据不同步导致浏览器用户访问异常</p>
+<p>CDN 缓存是指浏览器本地缓存失效后，浏览器会向 CDN 边缘节点发起请求，CDN 边缘节点也有一套缓存策略（因不同服务商会不同，但一般都遵守 HTTP 标准协议），通过<code>Cache-control: max-age</code>来设置缓存时间</p>
+<ol>
+<li>浏览器向 CDN 边缘节点发起请求，CDN 判断缓存数据是否过期（多维度判断，如 Cache-control、文件后缀等）</li>
+<li>数据过期：CDN 继续向服务器发起回源请求，拉取最新数据，更新本地缓存，并将最新数据返回给浏览器</li>
+<li>数据没过期：直接返回缓存数据</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_43263320/article/details/114623987">前端面经 http缓存机制</a><br><a target="_blank" rel="noopener" href="https://juejin.cn/post/6844904153043435533">图解 HTTP 缓存</a></p>
+
+  </div>
+  <div id=""></div>
+</div>
+
+<script>
+  
+Fancybox.bind('[data-fancybox="fancybox-gallery-img"]', {
+  dragToClose: true,
+  Toolbar: true,
+  closeButton: "top",
+  Image: {
+    zoom: true,
+  },
+  on: {
+    initCarousel: (fancybox) => {
+      const slide = fancybox.Carousel.slides[fancybox.Carousel.page];
+      fancybox.$container.style.setProperty(
+        "--bg-image",
+        `url("${slide.$thumb.src}")`
+      );
+    },
+    "Carousel.change": (fancybox, carousel, to, from) => {
+      const slide = carousel.slides[to];
+      fancybox.$container.style.setProperty(
+        "--bg-image",
+        `url("${slide.$thumb.src}")`
+      );
+    },
+  },
+});
+</script>
+
+<style>
+    #noneimg img {
+        display: none;
+        z-index: 9999;
+        /* width: 600px !important; */
+        min-width: 0%;
+        max-width: 90%;
+        max-height: 80%;
+        border-radius: 0px;
+        position: fixed;
+        box-shadow: 0 0 0px #c3c3c300 !important;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto !important;
+    }
+
+    @media screen and (max-width:600px) {
+        #noneimg img {
+            max-width: 88%
+        }
+    }
+</style>
+
+    <div class="post-paging" style="display: none;">
+    
+    <a href="/2022/09/20/handwritten-redux/">
+        <div class="post-paging-last">
+            <span>上一篇</span>
+            <p>Redux 基本实现</p>
+        </div>
+    </a>
+    
+
+    
+    <a href="/2022/04/22/csrf-xss-cors/">
+        <div class="post-paging-next">
+            <span>下一篇</span>
+            <p>网络安全-CSRF/XSS/CORS</p>
+        </div>
+    </a>
+    
+</div>
+</div>
+		
+<div class="footer">
+	<div class="Copyright">
+		©2023 By Jia
+	</div>
+	<div class="contact">
+		
+		<a href="">
+			<img src="/image/logo.png" alt="Quiet主题">
+		</a>
+		
+	</div>
+</div>
+
+<script src="/js/gotop.js"></script>
+
+
+<style type="text/css">
+    @media screen and (min-width: 600px) {
+        .goTop>span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            opacity: 0.8;
+            background: rgba(18, 24, 58, 0.06);
+            text-align: center;
+            transition: border .5s;
+            border: 1px solid rgba(18, 24, 58, 0.06);
+
+            -moz-transition: border .5s;
+            /* Firefox 4 */
+            -webkit-transition: border .5s;
+            /* Safari 和 Chrome */
+            -o-transition: border .5s;
+            /* Opera */
+        }
+
+        .goTop>span:hover {
+            border: 1px solid #6680B3;
+        }
+
+
+        .goTop {
+            position: fixed;
+            right: 30px;
+            bottom: 80px;
+        }
+
+        .goTop>span>svg {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+        }
+
+    }
+
+    @media screen and (max-width: 600px) {
+        .goTop {
+            display: none;
+        }
+    }
+</style>
+<div class="goTop" id="js-go_top">
+    <span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <g>
+                <path d="M13 12v8h-2v-8H4l8-8 8 8z"></path>
+            </g>
+        </svg>
+    </span>
+</div>
+<script>
+    $( '#js-go_top' )
+	.gotoTop( {
+		offset: 500,
+		speed: 300,
+		animationShow: {
+			'transform': 'translate(0,0)',
+			'transition': 'transform .5s ease-in-out'
+		},
+		animationHide: {
+			'transform': 'translate(100px,0)',
+			'transition': 'transform .5s ease-in-out'
+		}
+	} );
+</script>
+
+
+    <!-- Gitalk -->
+    <script>
+        const data = '{"clientID":"02b3c","clientSecret":"adfc7b4","repo":"gimment","owner":"duneng","admin":"duneng"}'
+        const gitalk = new Gitalk({
+            ...JSON.parse( data),
+            id:location.pathname,
+            distractionFreeMode:false
+        })
+        
+        if(Boolean('false')){
+            gitalk.render('gitalk-container')
+        }
+    </script>
+
+<script>
+	console.log('\n %c Hexo-Quiet 主题 %c https://github.com/79e/hexo-theme-quiet \n', 'color: #fadfa3; background: #030307; padding:5px 0;', 'background: #fadfa3; padding:5px 0;')
+</script>
+	</body>
+</html>
+

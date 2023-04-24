@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		
+<title>Redux 基本实现-Jia</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="shortcut icon" type="image/x-icon" href="/image/favicon.ico">
+
+<link rel="stylesheet" href="/css/index.css">
+
+
+
+<meta name="keywords" content="react,redux,">
+<meta name="description" content="">
+
+
+<script src="/js/jquery.min.js"></script>
+
+
+<script src="/js/index.js"></script>
+
+
+<script src="/js/fancybox.umd.js"></script>
+
+
+<script src="/js/fancybox-images.js"></script>
+
+
+<script src="/js/gitalk.min.js"></script>
+
+
+<script src="/js/hljs.min.js"></script>
+ 
+<script>hljs.highlightAll();</script>
+
+	<meta name="generator" content="Hexo 5.4.2"></head>
+
+	<body>
+		
+	<div class="header">
+		<div class="header-top" id="header-top">
+			<div class="h-left">
+				<a href="/">
+					<img src="/image/logo.png" alt="Quiet">
+				</a>
+			</div>
+			<div class="h-right">
+				<ul>
+					
+						
+								<li>
+									<a href="/">
+										ARTICLE
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+				</ul>
+			</div>
+			<div class="h-right-close">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+					<path fill="none" d="M0 0h24v24H0z" />
+					<path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z" fill="rgba(68,68,68,1)" />
+				</svg>
+			</div>
+		</div>
+	</div>
+	<div class="sidebar">
+    <div class="topo">
+        <h2>Jia</h2>
+    </div>
+    <ul>
+        
+        <li>
+            <a href="/">ARTICLE</a>
+        </li>
+        
+    </ul>
+    <div class="my_foot">
+        
+        <a href="">
+            <img src="/image/logo.png" alt="Quiet主题">
+        </a>
+        
+    </div>
+</div>
+<div class='shelter'>
+</div>
+<style>
+    .shelter{
+        background-color: #333;
+        opacity:0.5;
+        cursor: pointer;
+        display: none; 
+        position: fixed;
+        left: 0;
+        top: 0; 
+        right: 0;
+        bottom: 0;
+        z-index: 1998;
+    }
+    .sidebar {
+        width: 66%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        bottom: 0;
+        background: #fff;
+        z-index: 1999;
+        text-align: center;
+        box-shadow: -6px 0 20px rgba(98, 94, 94, .815);
+    }
+
+    .topo {
+        width: 100%;
+        height: 200px;
+        background: url(https://api.ixiaowai.cn/gqapi/gqapi.php) no-repeat;
+        background-size: 100% 100%;
+        position: relative;
+        display: flex;
+        align-items: flex-end
+    }
+
+    .topo h2 {
+        color: #fff;
+        z-index: 1;
+        position: relative;
+        margin: 0 0 10px 10px;
+        font-size: 1.2em;
+        box-sizing: border-box
+    }
+
+    .topo:before {
+        content: '';
+        background-image: url(/image/pattern.png);
+        background-repeat: repeat;
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        z-index: 1
+    }
+
+    .sidebar ul {
+        width: 100%;
+        margin-top: 50px
+    }
+
+    .sidebar ul li {
+        height: 50px;
+        list-style: none;
+        font-size: 1.2em;
+        text-align: right;
+        margin-right: 10px
+    }
+
+    .sidebar ul li a {
+        display: grid;
+        color: #5d606a;
+        text-overflow: ellipsis;
+        width: 100%;
+        text-decoration: none
+    }
+
+    .my_foot {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        position: absolute;
+        bottom: 0
+    }
+
+    .my_foot a {
+        text-decoration: none;
+        margin-right: 10px;
+        display: inline-block
+    }
+
+    .my_foot a img {
+        width: 30px;
+        height: 30px
+    }
+</style>
+
+<script>
+    $( function () {
+	$( '.h-right-close>svg' )
+		.click( function () {
+			$( '.sidebar' )
+				.animate( {
+					right: "0"
+				}, 500 );
+			$( '.shelter' )
+				.fadeIn( "slow" )
+		} );
+	$( '.shelter' )
+		.click( function ( e ) {
+			$( '.sidebar' )
+				.animate( {
+					right: "-100%"
+				}, 500 );
+			$( '.shelter' )
+				.fadeOut( "slow" )
+		} )
+} )
+
+</script>
+
+<div class="post">
+    <div class="post-header-background post-header-img">
+<!-- style="background: url('https://api.ixiaowai.cn/gqapi/gqapi.php')" -->
+    <div class="post-header-background-content">
+        <ul class="post-header-tag">
+            
+            
+            <li><a href="/tags/react">react</a></li>
+            
+            <li><a href="/tags/redux">redux</a></li>
+            
+            
+        </ul>
+        
+        <h1>Redux 基本实现</h1>
+        <div class="post-header-info">
+            <div class="post-header-info-author">
+                
+                    <svg t="1604839279282" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                        xmlns="http://www.w3.org/2000/svg" p-id="2901" width="20" height="20">
+                        <path
+                            d="M513 956.3c-247.7 0-448-200.3-448-448S265.3 66.2 513 66.2s448 200.3 448 448-200.3 442.1-448 442.1z m0-830.9c-212.2 0-388.8 170.7-388.8 388.8C124.2 726.3 294.9 903 513 903c212.2 0 388.8-170.7 388.8-388.8S725.2 125.4 513 125.4z m0 430.2c-94.2 0-170.7-76.5-170.7-170.7S418.8 207.8 513 207.8s170.7 76.5 170.7 170.7S607.2 555.6 513 555.6z m0-289.1c-64.6 0-112 52.8-112 112s47.4 117.9 112 117.9 112-52.8 112-112-47.4-117.9-112-117.9z m0 689.8c-135.7 0-259-58.7-341.9-158.9l-11.8-17.8 11.8-17.8c76.5-117.9 206.2-188.5 347.8-188.5 135.7 0 265 64.6 341.9 182.6l11.8 17.8-11.8 17.8C778 897.1 648.7 956.3 513 956.3zM230.3 773.2C300.9 849.7 406.9 897 513 897c112 0 218.1-47.4 288.6-129.8-70.5-88.2-170.7-135.6-282.7-135.6s-218.1 53.3-288.6 141.6z"
+                            p-id="2902" fill="#ffffff"></path>
+                    </svg>
+                    
+                <span class="post-header-info-author-text"> <a href="../../about">Jia</a></span>
+                <!-- <div class="post-header-info-author-categories">
+                    
+                         <a href="../../categories/vue/" target="_blank" >vue</a>
+                    
+                </div> -->
+                <p>2022-09-20 20:10:11</p>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="post-content" id="content">
+  
+  <div id="article" class="post-content-info">
+    
+
+    <h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>Redux 是 js 状态容器，提供可预测化的状态管理</p>
+<p>在日常开发中，组件间传值层级越深越繁琐，代码也会显得复杂冗余。Redux 提供全局单一数据源 store，使得组件间的数据传递，提升到全局统一管理、派发，结构清晰</p>
+<img src="img-1.jpg" width=100% height=250 alt=alt />
+
+<h2 id="工作流"><a href="#工作流" class="headerlink" title="工作流"></a>工作流</h2><p>Redux 工作流如下：</p>
+<img src="img-2.jpg" width=100% height=300 alt=alt />
+
+<p>store：存储 state 的中心仓库，可以对数据源进行统一管理，全局只有一个 store<br>action：将数据从应用传到 store 的有效载荷<br>reducer：reducer 是一个纯函数，根据 action 对象内的信息来改变 store 内的数据</p>
+<p>Redux 本身是一个单纯的状态机，Store 存放所有状态，Action 是一个改变状态的通知，Reducer 接收到通知来改 Store 中对应的状态</p>
+<h2 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; createStore &#125; <span class="keyword">from</span> <span class="string">&#x27;redux&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> initState = &#123;</span><br><span class="line">  <span class="attr">milk</span>: <span class="number">0</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">reducer</span>(<span class="params">state = initState, action</span>) &#123;</span><br><span class="line">  <span class="keyword">switch</span> (action.<span class="property">type</span>) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">&#x27;PUT_MILK&#x27;</span>:</span><br><span class="line">      <span class="keyword">return</span> &#123;...state, <span class="attr">milk</span>: state.<span class="property">milk</span> + action.<span class="property">count</span>&#125;;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">&#x27;TAKE_MILK&#x27;</span>:</span><br><span class="line">      <span class="keyword">return</span> &#123;...state, <span class="attr">milk</span>: state.<span class="property">milk</span> - action.<span class="property">count</span>&#125;;</span><br><span class="line">    <span class="attr">default</span>:</span><br><span class="line">      <span class="keyword">return</span> state;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> store = <span class="title function_">createStore</span>(reducer);</span><br><span class="line"></span><br><span class="line"><span class="comment">// subscribe其实就是订阅store的变化，一旦store发生了变化，传入的回调函数就会被调用</span></span><br><span class="line"><span class="comment">// 如果是结合页面更新，更新的操作就是在这里执行</span></span><br><span class="line">store.<span class="title function_">subscribe</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(store.<span class="title function_">getState</span>()));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 将action发出去要用dispatch</span></span><br><span class="line">store.<span class="title function_">dispatch</span>(&#123; <span class="attr">type</span>: <span class="string">&#x27;PUT_MILK&#x27;</span> &#125;);    <span class="comment">// milk: 1</span></span><br><span class="line">store.<span class="title function_">dispatch</span>(&#123; <span class="attr">type</span>: <span class="string">&#x27;PUT_MILK&#x27;</span> &#125;);    <span class="comment">// milk: 2</span></span><br><span class="line">store.<span class="title function_">dispatch</span>(&#123; <span class="attr">type</span>: <span class="string">&#x27;TAKE_MILK&#x27;</span> &#125;);   <span class="comment">// milk: 1</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="手写-Redux"><a href="#手写-Redux" class="headerlink" title="手写 Redux"></a>手写 Redux</h2><p>核心原理：发布订阅模式</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">createStore</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">let</span> state <span class="comment">// store 中所有的状态</span></span><br><span class="line">  <span class="keyword">let</span> listeners = []  <span class="comment">// 存储所有注册的回调</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 订阅所有更新</span></span><br><span class="line">  <span class="keyword">function</span> <span class="title function_">subscribe</span>(<span class="params">callback</span>) &#123;</span><br><span class="line">    listeners.<span class="title function_">push</span>(callback)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 派发更新通知: 执行所有的订阅了的回调</span></span><br><span class="line">  <span class="keyword">function</span> <span class="title function_">dispatch</span>(<span class="params">action</span>) &#123;</span><br><span class="line">    <span class="comment">// 发布事件前，更新 state 状态</span></span><br><span class="line">    state = <span class="title function_">reducer</span>(state, action);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> cb <span class="keyword">of</span> listeners) &#123;</span><br><span class="line">      <span class="title function_">cb</span>()</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 获取 store 中所有的状态</span></span><br><span class="line">  <span class="keyword">function</span> <span class="title function_">getState</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> state</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 返回 createStore 内的方法</span></span><br><span class="line">  <span class="keyword">const</span> store = &#123;</span><br><span class="line">    subscribe,</span><br><span class="line">    dispatch,</span><br><span class="line">    getState</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> store</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Middleware"><a href="#Middleware" class="headerlink" title="Middleware"></a>Middleware</h2><p>中间件 middeleware 执行的时机是在 dispatch 之前，其实就是拦截 dispatch，先注册 middeleware 执行之后再继续 dispatch 操作</p>
+<img src="img-3.jpg" width=100% height=400 alt=alt />
+
+<p>applyMiddleware 的作用是将 middeleware 串联起来进行链式调用</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; createStore, applyMiddleware &#125; <span class="keyword">from</span> <span class="string">&#x27;redux&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> thunk <span class="keyword">from</span> <span class="string">&#x27;redux-thunk&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 中间件 thunk 的使用</span></span><br><span class="line"><span class="keyword">const</span> store = <span class="title function_">createStore</span>(reducer, <span class="title function_">applyMiddleware</span>(thunk));</span><br></pre></td></tr></table></figure>
+
+<h2 id="API"><a href="#API" class="headerlink" title="API"></a>API</h2><h3 id="combineReducers"><a href="#combineReducers" class="headerlink" title="combineReducers"></a>combineReducers</h3><p>作用：组合不同模块的 reducer<br>基本用法：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; combineReducers &#125; <span class="keyword">from</span> <span class="string">&#x27;redux&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> count = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">countReducer</span>(<span class="params">state = count, action</span>) &#123;</span><br><span class="line">  <span class="keyword">switch</span> (action.<span class="property">type</span>) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">&#x27;ADD&#x27;</span>:</span><br><span class="line">      <span class="keyword">return</span> count++;</span><br><span class="line">    <span class="attr">default</span>:</span><br><span class="line">      <span class="keyword">return</span> state;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> name = <span class="string">&#x27;li&#x27;</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">nameReducer</span>(<span class="params">state = name, action</span>) &#123;</span><br><span class="line">  <span class="keyword">switch</span> (action.<span class="property">type</span>) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">&#x27;CHANGE_NAME&#x27;</span>:</span><br><span class="line">      <span class="keyword">return</span> action.<span class="property">name</span></span><br><span class="line">    <span class="attr">default</span>:</span><br><span class="line">      <span class="keyword">return</span> state;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用 combineReducers 组合两个 reducer</span></span><br><span class="line"><span class="keyword">const</span> reducer = <span class="title function_">combineReducers</span>(&#123; <span class="attr">countState</span>: countReducer, <span class="attr">nameState</span>: nameReducer &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>手写基础版 combineReducers</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">combineReducers</span>(<span class="params">reducerMap</span>) &#123;</span><br><span class="line">  <span class="comment">// reducerMap 为多个键值对的 reducer，如 &#123; countState: countReducer, nameState: nameReducer &#125;</span></span><br><span class="line">  <span class="keyword">const</span> reducerKeys = <span class="title class_">Object</span>.<span class="title function_">keys</span>(reducerMap)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> <span class="title function_">reducer</span> = (<span class="params">state = &#123;&#125;, action</span>) =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> newState = &#123;&#125;</span><br><span class="line">    <span class="comment">// 将每个键值对的 reducer 返回的 state 组装好返回</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> key <span class="keyword">of</span> reducerKeys) &#123;</span><br><span class="line">      <span class="keyword">const</span> currentReducer = reducerMap[key]</span><br><span class="line">      <span class="keyword">const</span> prevState = state[key]</span><br><span class="line">      newState[key] = <span class="title function_">currentReducer</span>(prevState, action)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> newState</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 返回普通结构的 reducer</span></span><br><span class="line">  <span class="keyword">return</span> reducer</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://juejin.cn/post/6975760113772527624">redux和react-redux</a><br><a target="_blank" rel="noopener" href="https://juejin.cn/post/6845166891682512909">手写一个Redux，深入理解其原理</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/144222700">Redux 图解原理</a></p>
+
+  </div>
+  <div id=""></div>
+</div>
+
+<script>
+  
+Fancybox.bind('[data-fancybox="fancybox-gallery-img"]', {
+  dragToClose: true,
+  Toolbar: true,
+  closeButton: "top",
+  Image: {
+    zoom: true,
+  },
+  on: {
+    initCarousel: (fancybox) => {
+      const slide = fancybox.Carousel.slides[fancybox.Carousel.page];
+      fancybox.$container.style.setProperty(
+        "--bg-image",
+        `url("${slide.$thumb.src}")`
+      );
+    },
+    "Carousel.change": (fancybox, carousel, to, from) => {
+      const slide = carousel.slides[to];
+      fancybox.$container.style.setProperty(
+        "--bg-image",
+        `url("${slide.$thumb.src}")`
+      );
+    },
+  },
+});
+</script>
+
+<style>
+    #noneimg img {
+        display: none;
+        z-index: 9999;
+        /* width: 600px !important; */
+        min-width: 0%;
+        max-width: 90%;
+        max-height: 80%;
+        border-radius: 0px;
+        position: fixed;
+        box-shadow: 0 0 0px #c3c3c300 !important;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto !important;
+    }
+
+    @media screen and (max-width:600px) {
+        #noneimg img {
+            max-width: 88%
+        }
+    }
+</style>
+
+    <div class="post-paging" style="display: none;">
+    
+    <a href="/2022/11/01/vue-diff/">
+        <div class="post-paging-last">
+            <span>上一篇</span>
+            <p>Vue Diff</p>
+        </div>
+    </a>
+    
+
+    
+    <a href="/2022/04/24/browser-cache/">
+        <div class="post-paging-next">
+            <span>下一篇</span>
+            <p>浏览器缓存</p>
+        </div>
+    </a>
+    
+</div>
+</div>
+		
+<div class="footer">
+	<div class="Copyright">
+		©2023 By Jia
+	</div>
+	<div class="contact">
+		
+		<a href="">
+			<img src="/image/logo.png" alt="Quiet主题">
+		</a>
+		
+	</div>
+</div>
+
+<script src="/js/gotop.js"></script>
+
+
+<style type="text/css">
+    @media screen and (min-width: 600px) {
+        .goTop>span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            opacity: 0.8;
+            background: rgba(18, 24, 58, 0.06);
+            text-align: center;
+            transition: border .5s;
+            border: 1px solid rgba(18, 24, 58, 0.06);
+
+            -moz-transition: border .5s;
+            /* Firefox 4 */
+            -webkit-transition: border .5s;
+            /* Safari 和 Chrome */
+            -o-transition: border .5s;
+            /* Opera */
+        }
+
+        .goTop>span:hover {
+            border: 1px solid #6680B3;
+        }
+
+
+        .goTop {
+            position: fixed;
+            right: 30px;
+            bottom: 80px;
+        }
+
+        .goTop>span>svg {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+        }
+
+    }
+
+    @media screen and (max-width: 600px) {
+        .goTop {
+            display: none;
+        }
+    }
+</style>
+<div class="goTop" id="js-go_top">
+    <span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <g>
+                <path d="M13 12v8h-2v-8H4l8-8 8 8z"></path>
+            </g>
+        </svg>
+    </span>
+</div>
+<script>
+    $( '#js-go_top' )
+	.gotoTop( {
+		offset: 500,
+		speed: 300,
+		animationShow: {
+			'transform': 'translate(0,0)',
+			'transition': 'transform .5s ease-in-out'
+		},
+		animationHide: {
+			'transform': 'translate(100px,0)',
+			'transition': 'transform .5s ease-in-out'
+		}
+	} );
+</script>
+
+
+    <!-- Gitalk -->
+    <script>
+        const data = '{"clientID":"02b3c","clientSecret":"adfc7b4","repo":"gimment","owner":"duneng","admin":"duneng"}'
+        const gitalk = new Gitalk({
+            ...JSON.parse( data),
+            id:location.pathname,
+            distractionFreeMode:false
+        })
+        
+        if(Boolean('false')){
+            gitalk.render('gitalk-container')
+        }
+    </script>
+
+<script>
+	console.log('\n %c Hexo-Quiet 主题 %c https://github.com/79e/hexo-theme-quiet \n', 'color: #fadfa3; background: #030307; padding:5px 0;', 'background: #fadfa3; padding:5px 0;')
+</script>
+	</body>
+</html>
+
