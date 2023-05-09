@@ -253,67 +253,314 @@
     
 
     <h2 id="响应式数据"><a href="#响应式数据" class="headerlink" title="响应式数据"></a>响应式数据</h2><p>响应式数据就是当数据改变后，可以通知到与这数据有关联的副作用函数执行，如下：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> obj = &#123; <span class="attr">text</span>: <span class="string">&#x27;hello world&#x27;</span> &#125;</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">effct</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="variable language_">document</span>.<span class="property">body</span>.<span class="property">innerHTML</span> = obj.<span class="property">text</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 响应式数据 obj：期望修改 obj.text 副作用函数 effct()可重新执行，更新视图 UI 为 &#x27;hello vue&#x27;</span></span><br><span class="line">obj.<span class="property">text</span> = <span class="string">&#x27;hello vue&#x27;</span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="javascript">const obj = &#123; text: &#39;hello world&#39; &#125;
+function effct() &#123;
+  document.body.innerHTML = obj.text
+&#125;
+// 响应式数据 obj：期望修改 obj.text 副作用函数 effct()可重新执行，更新视图 UI 为 &#39;hello vue&#39;
+obj.text = &#39;hello vue&#39;
+</code></pre>
 <h2 id="手写响应式-基础版"><a href="#手写响应式-基础版" class="headerlink" title="手写响应式-基础版"></a>手写响应式-基础版</h2><p>利用 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy">Proxy</a> 可以创建对象的代理，拦截对象的 <code>get、set</code>操作</p>
 <ul>
 <li>get：读操作时，存储副作用函数</li>
 <li>set：取操作时，执行副作用函数</li>
 </ul>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> bucket = <span class="keyword">new</span> <span class="title class_">Set</span>() <span class="comment">// 存储副作用函数</span></span><br><span class="line"><span class="comment">// reactive 函数作用：将 data 包装成响应式数据</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">reactive</span> = (<span class="params">data</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> reactiveData = <span class="keyword">new</span> <span class="title class_">Proxy</span>(data, &#123;</span><br><span class="line">    <span class="title function_">get</span>(<span class="params">target, key</span>) &#123;</span><br><span class="line">      <span class="comment">// 读取 data 时，存储与 data 关联的副作用函数 effct</span></span><br><span class="line">      <span class="comment">// 基础版 effct 采用硬编码方式，写死名称</span></span><br><span class="line">      bucket.<span class="title function_">add</span>(effct)</span><br><span class="line">      <span class="keyword">return</span> target[key]</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="title function_">set</span>(<span class="params">target, key, newVal</span>) &#123;</span><br><span class="line">      target[key] = newVal</span><br><span class="line">      <span class="comment">// 修改 data 值时，从 bucket 取出副作用函数依次执行</span></span><br><span class="line">      bucket.<span class="title function_">forEach</span>(<span class="function"><span class="params">fn</span> =&gt;</span> <span class="title function_">fn</span>())</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="keyword">return</span> reactiveData</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 测试</span></span><br><span class="line"><span class="keyword">const</span> obj = <span class="title function_">reactive</span>(&#123; <span class="attr">text</span>: <span class="string">&#x27;hello world&#x27;</span> &#125;)</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">effct</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="variable language_">document</span>.<span class="property">body</span>.<span class="property">innerHTML</span> = obj.<span class="property">text</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="title function_">effct</span>()</span><br><span class="line"><span class="comment">// 1s 后修改 obj.text 值，期望视图由 &#x27;hello world&#x27; 变成 &#x27;hello vue&#x27;</span></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  obj.<span class="property">text</span> = <span class="string">&#x27;hello vue&#x27;</span></span><br><span class="line">&#125;, <span class="number">1000</span>)</span><br></pre></td></tr></table></figure>
+<pre><code class="javascript">const bucket = new Set() // 存储副作用函数
+// reactive 函数作用：将 data 包装成响应式数据
+const reactive = (data) =&gt; &#123;
+  const reactiveData = new Proxy(data, &#123;
+    get(target, key) &#123;
+      // 读取 data 时，存储与 data 关联的副作用函数 effct
+      // 基础版 effct 采用硬编码方式，写死名称
+      bucket.add(effct)
+      return target[key]
+    &#125;,
+    set(target, key, newVal) &#123;
+      target[key] = newVal
+      // 修改 data 值时，从 bucket 取出副作用函数依次执行
+      bucket.forEach(fn =&gt; fn())
+    &#125;,
+  &#125;)
+  return reactiveData
+&#125;
 
+// 测试
+const obj = reactive(&#123; text: &#39;hello world&#39; &#125;)
+function effct() &#123;
+  document.body.innerHTML = obj.text
+&#125;
+effct()
+// 1s 后修改 obj.text 值，期望视图由 &#39;hello world&#39; 变成 &#39;hello vue&#39;
+setTimeout(() =&gt; &#123;
+  obj.text = &#39;hello vue&#39;
+&#125;, 1000)
+</code></pre>
 <h2 id="手写响应式-注册副作用函数"><a href="#手写响应式-注册副作用函数" class="headerlink" title="手写响应式-注册副作用函数"></a>手写响应式-注册副作用函数</h2><p>“基础版”的响应式的副作用函数<code>effct</code>是硬编码的，如果修改<code>effct</code>的名字，代码就如法正常运行，那么我们就需要一个注册副作用函数的机制，支持任何命名的副作用函数：</p>
 <ul>
 <li>定义<code>activeEffect</code>存储任何命名的副作用函数</li>
 <li>执行<code>fn</code>触发数据读操作，将<code>fn</code>存储在<code>bucket</code>中</li>
 <li>数据写操作时，将<code>bucket</code>中副作用函数拿出来执行</li>
 </ul>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> bucket = <span class="keyword">new</span> <span class="title class_">Set</span>()</span><br><span class="line"><span class="keyword">let</span> activeEffect; <span class="comment">// 【新增】存储注册的副作用函数：解决基础版硬编码“effect”</span></span><br><span class="line"><span class="comment">// 【新增】用来注册副作用函数</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">effect</span>(<span class="params">fn</span>) &#123;</span><br><span class="line">  activeEffect = fn</span><br><span class="line">  <span class="title function_">fn</span>()  <span class="comment">// 执行 fn，触发 reactive get 操作，存储 fn</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">reactive</span> = (<span class="params">data</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> reactiveData = <span class="keyword">new</span> <span class="title class_">Proxy</span>(data, &#123;</span><br><span class="line">    <span class="title function_">get</span>(<span class="params">target, key</span>) &#123;</span><br><span class="line">      <span class="comment">// 读取 data 时，存储与 data 关联的副作用函数 activeEffect </span></span><br><span class="line">      activeEffect &amp;&amp; bucket.<span class="title function_">add</span>(activeEffect)  <span class="comment">// 【新增】</span></span><br><span class="line">      <span class="keyword">return</span> target[key]</span><br><span class="line">    &#125;,</span><br><span class="line">   <span class="comment">// ...省略</span></span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="keyword">return</span> reactiveData</span><br><span class="line">&#125;</span><br><span class="line"><span class="title function_">effect</span>(changeBodyText)  <span class="comment">// 【新增】用 effect 注册副作用函数</span></span><br></pre></td></tr></table></figure>
+<pre><code class="javascript">const bucket = new Set()
+let activeEffect; // 【新增】存储注册的副作用函数：解决基础版硬编码“effect”
+// 【新增】用来注册副作用函数
+function effect(fn) &#123;
+  activeEffect = fn
+  fn()  // 执行 fn，触发 reactive get 操作，存储 fn
+&#125;
 
+const reactive = (data) =&gt; &#123;
+  const reactiveData = new Proxy(data, &#123;
+    get(target, key) &#123;
+      // 读取 data 时，存储与 data 关联的副作用函数 activeEffect 
+      activeEffect &amp;&amp; bucket.add(activeEffect)  // 【新增】
+      return target[key]
+    &#125;,
+   // ...省略
+  &#125;)
+  return reactiveData
+&#125;
+effect(changeBodyText)  // 【新增】用 effect 注册副作用函数
+</code></pre>
 <h2 id="手写响应式-目标属性与副作用函数关联"><a href="#手写响应式-目标属性与副作用函数关联" class="headerlink" title="手写响应式-目标属性与副作用函数关联"></a>手写响应式-目标属性与副作用函数关联</h2><p>“注册副作用函数”的响应式其实建立的是对象和副作用函数之间的关联，并未具体到对象属性和副作用函数的关联，这样就会引发只要修改对象上任一属性，都会触发副作用函数执行的问题</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> obj = <span class="title function_">reactive1</span>(&#123; <span class="attr">text</span>: <span class="string">&#x27;hello world&#x27;</span> &#125;)</span><br><span class="line"><span class="title function_">effect</span>(<span class="function">()=&gt;</span>&#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;effect 执行了&#x27;</span>)  <span class="comment">// 会打印两次</span></span><br><span class="line">  <span class="variable language_">document</span>.<span class="property">body</span>.<span class="property">innerHTML</span> = obj.<span class="property">text</span></span><br><span class="line">&#125;)</span><br><span class="line">obj.<span class="property">text</span> = <span class="string">&#x27;hello vue&#x27;</span>  <span class="comment">// 会触发 effect 执行</span></span><br><span class="line">obj.<span class="property">desc</span> = <span class="string">&#x27;something&#x27;</span>  <span class="comment">// desc 未和 effect 关联也会触发 effect 执行</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
+<pre><code class="javascript">const obj = reactive1(&#123; text: &#39;hello world&#39; &#125;)
+effect(()=&gt;&#123;
+  console.log(&#39;effect 执行了&#39;)  // 会打印两次
+  document.body.innerHTML = obj.text
+&#125;)
+obj.text = &#39;hello vue&#39;  // 会触发 effect 执行
+obj.desc = &#39;something&#39;  // desc 未和 effect 关联也会触发 effect 执行
+</code></pre>
 <p>要解决<code>effect</code>被触发两次问题，只要修改响应式和<code>effect</code>的关联就可以了</p>
 <img src="img-1.jpg" width=100% height=300 alt=alt />
 
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> bucket = <span class="keyword">new</span> <span class="title class_">WeakMap</span>()</span><br><span class="line"><span class="comment">// ...省略 effect 相关代码</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">reactive</span> = (<span class="params">data</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> reactiveData = <span class="keyword">new</span> <span class="title class_">Proxy</span>(data, &#123;</span><br><span class="line">    <span class="title function_">get</span>(<span class="params">target, key</span>) &#123;</span><br><span class="line">      <span class="title function_">track</span>(target, key)   <span class="comment">// 【新增】存储副作用函数</span></span><br><span class="line">      <span class="keyword">return</span> target[key]</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="title function_">set</span>(<span class="params">target, key, newVal</span>) &#123;</span><br><span class="line">      target[key] = newVal</span><br><span class="line">      <span class="title function_">trigger</span>(target, key) <span class="comment">// 【新增】执行副作用函数</span></span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="keyword">return</span> reactiveData</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// get 拦截时调用 track 追踪变化</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">track</span>(<span class="params">target, key</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (!activeEffect) <span class="keyword">return</span> <span class="comment">// 没副作用函数时，直接返回</span></span><br><span class="line">  <span class="keyword">let</span> depsMap = bucket.<span class="title function_">get</span>(target)</span><br><span class="line">  <span class="keyword">if</span> (!depsMap) &#123;</span><br><span class="line">    <span class="comment">// 建立 target--&gt;key 关联</span></span><br><span class="line">    bucket.<span class="title function_">set</span>(target, depsMap = <span class="keyword">new</span> <span class="title class_">Map</span>())</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">let</span> deps = depsMap.<span class="title function_">get</span>(key)</span><br><span class="line">  <span class="keyword">if</span> (!deps) &#123;</span><br><span class="line">    <span class="comment">// 建立 key--&gt;effect 关联</span></span><br><span class="line">    depsMap.<span class="title function_">set</span>(key, deps = <span class="keyword">new</span> <span class="title class_">Set</span>())</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 添加 effect</span></span><br><span class="line">  deps.<span class="title function_">add</span>(activeEffect)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// set 拦截时调用 trigger 触发变化</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">trigger</span>(<span class="params">target, key</span>) &#123;</span><br><span class="line">  <span class="comment">// 读取 target 中的 key</span></span><br><span class="line">  <span class="keyword">const</span> depsMap = bucket.<span class="title function_">get</span>(target)</span><br><span class="line">  <span class="keyword">if</span> (!depsMap) <span class="keyword">return</span></span><br><span class="line">  <span class="comment">// 读取 key 中关联的 effect</span></span><br><span class="line">  <span class="keyword">const</span> effcts = depsMap.<span class="title function_">get</span>(key)</span><br><span class="line">  effcts &amp;&amp; effcts.<span class="title function_">forEach</span>(<span class="function"><span class="params">fn</span> =&gt;</span> <span class="title function_">fn</span>())</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 测试</span></span><br><span class="line"><span class="keyword">const</span> obj = <span class="title function_">reactive</span>(&#123; <span class="attr">text</span>: <span class="string">&#x27;hello world&#x27;</span> &#125;)</span><br><span class="line"><span class="title function_">effect</span>(<span class="function">()=&gt;</span>&#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;effect 执行了&#x27;</span>)  <span class="comment">// 会打印一次</span></span><br><span class="line">  <span class="variable language_">document</span>.<span class="property">body</span>.<span class="property">innerHTML</span> = obj.<span class="property">text</span></span><br><span class="line">&#125;)</span><br><span class="line">obj.<span class="property">text</span> = <span class="string">&#x27;hello vue&#x27;</span>  <span class="comment">// 会触发 effect 执行</span></span><br><span class="line">obj.<span class="property">desc</span> = <span class="string">&#x27;something&#x27;</span>  <span class="comment">// 不会触发 effect 执行</span></span><br></pre></td></tr></table></figure>
+<pre><code class="javascript">const bucket = new WeakMap()
+// ...省略 effect 相关代码
+const reactive = (data) =&gt; &#123;
+  const reactiveData = new Proxy(data, &#123;
+    get(target, key) &#123;
+      track(target, key)   // 【新增】存储副作用函数
+      return target[key]
+    &#125;,
+    set(target, key, newVal) &#123;
+      target[key] = newVal
+      trigger(target, key) // 【新增】执行副作用函数
+    &#125;,
+  &#125;)
+  return reactiveData
+&#125;
+// get 拦截时调用 track 追踪变化
+function track(target, key) &#123;
+  if (!activeEffect) return // 没副作用函数时，直接返回
+  let depsMap = bucket.get(target)
+  if (!depsMap) &#123;
+    // 建立 target--&gt;key 关联
+    bucket.set(target, depsMap = new Map())
+  &#125;
+  let deps = depsMap.get(key)
+  if (!deps) &#123;
+    // 建立 key--&gt;effect 关联
+    depsMap.set(key, deps = new Set())
+  &#125;
+  // 添加 effect
+  deps.add(activeEffect)
+&#125;
+// set 拦截时调用 trigger 触发变化
+function trigger(target, key) &#123;
+  // 读取 target 中的 key
+  const depsMap = bucket.get(target)
+  if (!depsMap) return
+  // 读取 key 中关联的 effect
+  const effcts = depsMap.get(key)
+  effcts &amp;&amp; effcts.forEach(fn =&gt; fn())
+&#125;
 
+// 测试
+const obj = reactive(&#123; text: &#39;hello world&#39; &#125;)
+effect(()=&gt;&#123;
+  console.log(&#39;effect 执行了&#39;)  // 会打印一次
+  document.body.innerHTML = obj.text
+&#125;)
+obj.text = &#39;hello vue&#39;  // 会触发 effect 执行
+obj.desc = &#39;something&#39;  // 不会触发 effect 执行
+</code></pre>
 <h2 id="手写响应式-避免死循环"><a href="#手写响应式-避免死循环" class="headerlink" title="手写响应式-避免死循环"></a>手写响应式-避免死循环</h2><p>“注册副作用函数”的响应式会带来一个无限递归循环，造成栈溢出问题</p>
 <ul>
 <li>执行<code>obj.foo</code>触发<code>obj</code>的<code>get</code>操作，将副作用收集到桶中</li>
 <li>执行<code>obj.foo = obj.foo + 1</code>触发<code>obj</code>的<code>set</code>操作，执行桶中副作用函数，执行时又会触发<code>obj.foo get</code>操作，造成循环性的触发<code>get``set</code>操作，不断的执行副作用函数</li>
 </ul>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> obj = <span class="title function_">reactive</span>(&#123; <span class="attr">foo</span>: <span class="number">1</span> &#125;)</span><br><span class="line"><span class="title function_">effect</span>(<span class="function">() =&gt;</span> obj.<span class="property">foo</span> = obj.<span class="property">foo</span> + <span class="number">1</span>) <span class="comment">// 无限循环触发读写操作，操作栈溢出</span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="javascript">const obj = reactive(&#123; foo: 1 &#125;)
+effect(() =&gt; obj.foo = obj.foo + 1) // 无限循环触发读写操作，操作栈溢出
+</code></pre>
 <p>解决方案：<code>get</code>操作执行完副作用函数后，重置<code>activeEffect</code>，在<code>set</code>触发副作用函数执行时，判断是否和现在正在执行的副作用函数相同，相同则不执行</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> activeEffect;</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">effect</span>(<span class="params">fn</span>) &#123;</span><br><span class="line">  activeEffect = fn</span><br><span class="line">  <span class="title function_">fn</span>()</span><br><span class="line">  activeEffect = <span class="literal">null</span>  <span class="comment">// 【新增】注册完副作用函数后，重置 activeEffect，避免一直占用</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">trigger</span>(<span class="params">target, key</span>) &#123;</span><br><span class="line">  <span class="comment">// ...省略</span></span><br><span class="line">  <span class="keyword">const</span> effcts = depsMap.<span class="title function_">get</span>(key)</span><br><span class="line">  effcts &amp;&amp; effcts.<span class="title function_">forEach</span>(<span class="function"><span class="params">fn</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 【新增】当在 set 中要触发副作用函数时，如与当前正在执行的副作用函数相同，则不继续执行</span></span><br><span class="line">    <span class="keyword">if</span> (fn === activeEffect) <span class="keyword">return</span></span><br><span class="line">    <span class="title function_">fn</span>()</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="javascript">let activeEffect;
+function effect(fn) &#123;
+  activeEffect = fn
+  fn()
+  activeEffect = null  // 【新增】注册完副作用函数后，重置 activeEffect，避免一直占用
+&#125;
 
+function trigger(target, key) &#123;
+  // ...省略
+  const effcts = depsMap.get(key)
+  effcts &amp;&amp; effcts.forEach(fn =&gt; &#123;
+    // 【新增】当在 set 中要触发副作用函数时，如与当前正在执行的副作用函数相同，则不继续执行
+    if (fn === activeEffect) return
+    fn()
+  &#125;)
+&#125;
+</code></pre>
 <h2 id="手写响应式-支持调度"><a href="#手写响应式-支持调度" class="headerlink" title="手写响应式-支持调度"></a>手写响应式-支持调度</h2><p>可调度：当<code>set</code>触发副作用函数重新执行时，可以调度副作用函数的执行时机、次数以及方式等，以执行时机为例</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在未调度时，下面代码打印顺序为：1-2-end</span></span><br><span class="line"><span class="comment">// 期望调度执行时机后，印顺序为：1-end-2，即 obj.foo++ 会调度执行</span></span><br><span class="line"><span class="keyword">const</span> obj = <span class="title function_">reactive4</span>(&#123; <span class="attr">foo</span>: <span class="number">1</span> &#125;)</span><br><span class="line"><span class="title function_">effect</span>(<span class="function">() =&gt;</span> &#123; <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;obj.foo==&gt;&#x27;</span>, obj.<span class="property">foo</span>) &#125;)</span><br><span class="line">obj.<span class="property">foo</span>++</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;end&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
+<pre><code class="javascript">// 在未调度时，下面代码打印顺序为：1-2-end
+// 期望调度执行时机后，印顺序为：1-end-2，即 obj.foo++ 会调度执行
+const obj = reactive4(&#123; foo: 1 &#125;)
+effect(() =&gt; &#123; console.log(&#39;obj.foo==&gt;&#39;, obj.foo) &#125;)
+obj.foo++
+console.log(&#39;end&#39;)
+</code></pre>
 <p>解决方案：为<code>effect</code>函数添加一个可选配置参数<code>options</code>，用来设置调度相关的逻辑</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> activeEffect;</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">effect</span>(<span class="params">fn, options = &#123;&#125;</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> <span class="title function_">effectFn</span> = (<span class="params"></span>) =&gt; &#123;   <span class="comment">// 【新增】修改副作用函数结构，使其可挂载 options 属性</span></span><br><span class="line">    activeEffect = effectFn</span><br><span class="line">    <span class="title function_">fn</span>()</span><br><span class="line">    activeEffect = <span class="literal">null</span></span><br><span class="line">  &#125;</span><br><span class="line">  effectFn.<span class="property">options</span> = options  <span class="comment">// 【新增】将 options 添加到副作用函数中</span></span><br><span class="line">  <span class="title function_">effectFn</span>()</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">trigger</span>(<span class="params">target, key</span>) &#123;</span><br><span class="line">  <span class="comment">// ...省略</span></span><br><span class="line">  effcts &amp;&amp; effcts.<span class="title function_">forEach</span>(<span class="function"><span class="params">fn</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (fn === activeEffect3) <span class="keyword">return</span></span><br><span class="line">    <span class="keyword">if</span> (fn.<span class="property">options</span>.<span class="property">scheduler</span>) &#123; <span class="comment">// 【新增】当存在 options 时，单独处理</span></span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;进入调度了&#x27;</span>)</span><br><span class="line">      fn.<span class="property">options</span>.<span class="title function_">scheduler</span>(fn)  <span class="comment">// 将 fn 的执行权交给 scheduler，让用户自己决定执行时机</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="title function_">fn</span>()  <span class="comment">// 按之前逻辑默认执行</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 测试：期望在不改变代码顺序时，打印顺序由：1-2-end 变成 1-end-2，即 obj.foo++ 调度执行</span></span><br><span class="line"><span class="keyword">const</span> obj = <span class="title function_">reactive4</span>(&#123; <span class="attr">foo</span>: <span class="number">1</span> &#125;)</span><br><span class="line"><span class="title function_">effect</span>(</span><br><span class="line">  <span class="function">() =&gt;</span> &#123; <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;obj.foo==&gt;&#x27;</span>, obj.<span class="property">foo</span>) &#125;,</span><br><span class="line">  &#123; <span class="comment">// scheduler 调度副作用函数执行时机，也可以增加其它配置进行相应的处理</span></span><br><span class="line">    <span class="title function_">scheduler</span>(<span class="params">fn</span>) &#123;</span><br><span class="line">      <span class="built_in">setTimeout</span>(fn)  <span class="comment">// 将 fn 放到宏任务队列中执行</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">)</span><br><span class="line">obj.<span class="property">foo</span>++</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;end&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
+<pre><code class="javascript">let activeEffect;
+function effect(fn, options = &#123;&#125;) &#123;
+  const effectFn = () =&gt; &#123;   // 【新增】修改副作用函数结构，使其可挂载 options 属性
+    activeEffect = effectFn
+    fn()
+    activeEffect = null
+  &#125;
+  effectFn.options = options  // 【新增】将 options 添加到副作用函数中
+  effectFn()
+&#125;
+function trigger(target, key) &#123;
+  // ...省略
+  effcts &amp;&amp; effcts.forEach(fn =&gt; &#123;
+    if (fn === activeEffect3) return
+    if (fn.options.scheduler) &#123; // 【新增】当存在 options 时，单独处理
+      console.log(&#39;进入调度了&#39;)
+      fn.options.scheduler(fn)  // 将 fn 的执行权交给 scheduler，让用户自己决定执行时机
+    &#125; else &#123;
+      fn()  // 按之前逻辑默认执行
+    &#125;
+  &#125;)
+&#125;
+// 测试：期望在不改变代码顺序时，打印顺序由：1-2-end 变成 1-end-2，即 obj.foo++ 调度执行
+const obj = reactive4(&#123; foo: 1 &#125;)
+effect(
+  () =&gt; &#123; console.log(&#39;obj.foo==&gt;&#39;, obj.foo) &#125;,
+  &#123; // scheduler 调度副作用函数执行时机，也可以增加其它配置进行相应的处理
+    scheduler(fn) &#123;
+      setTimeout(fn)  // 将 fn 放到宏任务队列中执行
+    &#125;
+  &#125;
+)
+obj.foo++
+console.log(&#39;end&#39;)
+</code></pre>
 <h2 id="手写响应式-完善非原始值代理"><a href="#手写响应式-完善非原始值代理" class="headerlink" title="手写响应式-完善非原始值代理"></a>手写响应式-完善非原始值代理</h2><p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy">Proxy</a> 是对对象的代理，可以拦截对象的基本操作和自定义，也就是说，Proxy 是不能代理非对象的（这种情况后面讨论），代理对象是只能拦截/自定义基本操作，如读取、设置，对于非基础操作（复杂操作），如对象下的方法调用是无法继续拦截的，这就会暴露出下面的问题：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> data = &#123;</span><br><span class="line">  <span class="attr">foo</span>: <span class="number">1</span>,</span><br><span class="line">  <span class="keyword">get</span> <span class="title function_">bar</span>() &#123;  <span class="comment">// 这个为 getter</span></span><br><span class="line">    <span class="comment">// this 指向 data 原始对象, this.foo 等价于 data.foo，是不会建立副作用函数和 data.foo 的联系的</span></span><br><span class="line">    <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">foo</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> obj = <span class="title function_">reactive</span>(data)</span><br><span class="line"><span class="comment">// 正常流程：obj.bar 时执行 getter 函数，getter 访问了 this.foo，读取了 foo 的值，所以副作用函数会和 foo 建立联系，当修改 foo 是会触发副作用函数执行</span></span><br><span class="line"><span class="title function_">effect</span>(<span class="function">() =&gt;</span> &#123; </span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;obj.foo==&gt;&#x27;</span>, obj.<span class="property">bar</span>) </span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// 【期望】修改 foo 会触发副作用函数执行</span></span><br><span class="line"><span class="comment">// 【实际】修改 foo 不会触发副作用函数执行</span></span><br><span class="line">obj.<span class="property">foo</span>++</span><br></pre></td></tr></table></figure>
-
+<pre><code class="javascript">const data = &#123;
+  foo: 1,
+  get bar() &#123;  // 这个为 getter
+    // this 指向 data 原始对象, this.foo 等价于 data.foo，是不会建立副作用函数和 data.foo 的联系的
+    return this.foo
+  &#125;
+&#125;
+const obj = reactive(data)
+// 正常流程：obj.bar 时执行 getter 函数，getter 访问了 this.foo，读取了 foo 的值，所以副作用函数会和 foo 建立联系，当修改 foo 是会触发副作用函数执行
+effect(() =&gt; &#123; 
+  console.log(&#39;obj.foo==&gt;&#39;, obj.bar) 
+&#125;)
+// 【期望】修改 foo 会触发副作用函数执行
+// 【实际】修改 foo 不会触发副作用函数执行
+obj.foo++
+</code></pre>
 <p>上述问题就出现在<code>get bar()&#123; return this.foo &#125;</code>中，bar 的<code>this</code>其实指向的是<code>data</code>而非响应式<code>obj</code>所以<code>obj.foo++</code>是不会触发副作用函数执行的</p>
 <p>这里就可以通过 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect">Reflect</a> 来解决，<code>Reflect.get()，Reflect.set()</code>的第三个参数是可以为<code>getter</code>指定<code>this</code></p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">reactive</span> = (<span class="params">data</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> reactiveData = <span class="keyword">new</span> <span class="title class_">Proxy</span>(data, &#123;</span><br><span class="line">    <span class="title function_">get</span>(<span class="params">target, key, receiver</span>) &#123;</span><br><span class="line">      <span class="title function_">track</span>(target, key)</span><br><span class="line">      <span class="comment">// return target[key]</span></span><br><span class="line">      <span class="keyword">return</span> <span class="title class_">Reflect</span>.<span class="title function_">get</span>(target, key,receiver)	<span class="comment">// 【新增】</span></span><br><span class="line"></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="title function_">set</span>(<span class="params">target, key, newVal, receiver</span>) &#123;</span><br><span class="line">      <span class="comment">// target[key] = newVal</span></span><br><span class="line">      <span class="keyword">const</span> res = <span class="title class_">Reflect</span>.<span class="title function_">set</span>(target, key,newVal,receiver)	<span class="comment">// 【新增】</span></span><br><span class="line">      <span class="title function_">trigger</span>(target, key)</span><br><span class="line">      <span class="keyword">return</span> res</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="keyword">return</span> reactiveData</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 测试</span></span><br><span class="line"><span class="keyword">const</span> data = &#123;</span><br><span class="line">  <span class="attr">foo</span>: <span class="number">1</span>,</span><br><span class="line">  <span class="keyword">get</span> <span class="title function_">bar</span>() &#123;</span><br><span class="line">    <span class="comment">// 此时 this 指向调用 getter 的 obj</span></span><br><span class="line">    <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">foo</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> obj = <span class="title function_">reactive</span>(data)</span><br><span class="line"><span class="title function_">effect</span>(<span class="function">() =&gt;</span> &#123; </span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;obj.foo==&gt;&#x27;</span>, obj.<span class="property">bar</span>) </span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// 修改 foo 会触发副作用函数执行</span></span><br><span class="line">obj.<span class="property">foo</span>++</span><br></pre></td></tr></table></figure>
+<pre><code class="javascript">const reactive = (data) =&gt; &#123;
+  const reactiveData = new Proxy(data, &#123;
+    get(target, key, receiver) &#123;
+      track(target, key)
+      // return target[key]
+      return Reflect.get(target, key,receiver)    // 【新增】
 
+    &#125;,
+    set(target, key, newVal, receiver) &#123;
+      // target[key] = newVal
+      const res = Reflect.set(target, key,newVal,receiver)    // 【新增】
+      trigger(target, key)
+      return res
+    &#125;,
+  &#125;)
+  return reactiveData
+&#125;
+
+// 测试
+const data = &#123;
+  foo: 1,
+  get bar() &#123;
+    // 此时 this 指向调用 getter 的 obj
+    return this.foo
+  &#125;
+&#125;
+const obj = reactive(data)
+effect(() =&gt; &#123; 
+  console.log(&#39;obj.foo==&gt;&#39;, obj.bar) 
+&#125;)
+// 修改 foo 会触发副作用函数执行
+obj.foo++
+</code></pre>
 <h2 id="手写响应式-支持深响应"><a href="#手写响应式-支持深响应" class="headerlink" title="手写响应式-支持深响应"></a>手写响应式-支持深响应</h2><p>上述实现的<code>reactive</code>都是浅响应的，如下：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> obj = <span class="title function_">reactive</span>(&#123;</span><br><span class="line">  <span class="attr">foo</span>: &#123;</span><br><span class="line">    <span class="attr">bar</span>: <span class="number">1</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line"><span class="title function_">effect</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;obj.foo.bar==&gt;&#x27;</span>, obj.<span class="property">foo</span>.<span class="property">bar</span>)</span><br><span class="line">&#125;)</span><br><span class="line">obj.<span class="property">foo</span>.<span class="property">bar</span>++ <span class="comment">// 【问题】修改 obj.foo.bar 是不会触发响应的</span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="javascript">const obj = reactive(&#123;
+  foo: &#123;
+    bar: 1
+  &#125;
+&#125;)
+effect(() =&gt; &#123;
+  console.log(&#39;obj.foo.bar==&gt;&#39;, obj.foo.bar)
+&#125;)
+obj.foo.bar++ // 【问题】修改 obj.foo.bar 是不会触发响应的
+</code></pre>
 <p>原因是<code>Reflect.get</code>拿到的<code>&#123; bar: 1 &#125;</code>是一个普通对象，并不会建立响应连接，如果需要建立深度响应连接，那么需要修改<code>Reflect.get</code></p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">reactive</span> = (<span class="params">data</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> reactiveData = <span class="keyword">new</span> <span class="title class_">Proxy</span>(data, &#123;</span><br><span class="line">    <span class="title function_">get</span>(<span class="params">target, key, receiver</span>) &#123;</span><br><span class="line">      <span class="title function_">track</span>(target, key)</span><br><span class="line">      <span class="keyword">const</span> res = <span class="title class_">Reflect</span>.<span class="title function_">get</span>(target, key, receiver)</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">typeof</span> res === <span class="string">&#x27;object&#x27;</span> &amp;&amp; res !== <span class="literal">null</span>) &#123;	<span class="comment">// 【新增】不断递归处理深层响应</span></span><br><span class="line">        <span class="keyword">return</span> <span class="title function_">reactive</span>(res)</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> res</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="comment">// ...省略</span></span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="keyword">return</span> reactiveData</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="javascript">const reactive = (data) =&gt; &#123;
+  const reactiveData = new Proxy(data, &#123;
+    get(target, key, receiver) &#123;
+      track(target, key)
+      const res = Reflect.get(target, key, receiver)
+      if (typeof res === &#39;object&#39; &amp;&amp; res !== null) &#123;    // 【新增】不断递归处理深层响应
+        return reactive(res)
+      &#125;
+      return res
+    &#125;,
+    // ...省略
+  &#125;)
+  return reactiveData
+&#125;
+</code></pre>
 <p>修改后的<code>reactive</code>就可以支持深响应了，<code>obj.foo.bar++</code>修改时会触发响应</p>
 <h2 id="手写响应式-支持原始值"><a href="#手写响应式-支持原始值" class="headerlink" title="手写响应式-支持原始值"></a>手写响应式-支持原始值</h2><p>上述<code>reactive</code>响应式方案是借助<code>Proxy</code>实现的，<code>Proxy</code>是代理对象的，无法代理原理值（Boolean、Number、String、undefined、null、Symbol、BigInt 等），因为原始值是按值传递的，并非按引用传递，无法在形参和实参之间建立联系。如果想将原始值变成响应式数据，就需对其做一层包裹</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Proxy 是无法代理非对象值的，所以以下代码会报错</span></span><br><span class="line"><span class="keyword">let</span> age = <span class="title function_">reactive</span>(<span class="number">1</span>)</span><br><span class="line"><span class="title function_">effect</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;res ==&gt;&#x27;</span>, age)</span><br><span class="line">&#125;)</span><br><span class="line">age++</span><br></pre></td></tr></table></figure>
-
+<pre><code class="javascript">// Proxy 是无法代理非对象值的，所以以下代码会报错
+let age = reactive(1)
+effect(() =&gt; &#123;
+  console.log(&#39;res ==&gt;&#39;, age)
+&#125;)
+age++
+</code></pre>
 <p>引出<code>ref</code>将原始值包装成对象，使其可用<code>Proxy</code>代理，从而支持响应式：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">ref</span>(<span class="params">val</span>)&#123;</span><br><span class="line">  <span class="keyword">const</span> wrapper = &#123;</span><br><span class="line">    <span class="attr">value</span>: val</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 在 wrapper 上定义一个不可枚举属性 __v_isRef: true，用来区分是 ref 数据还是普通响应式数据</span></span><br><span class="line">  <span class="title class_">Object</span>.<span class="title function_">defineProperty</span>(wrapper, <span class="string">&#x27;__v_isRef&#x27;</span>,&#123;</span><br><span class="line">    <span class="attr">value</span>: <span class="literal">true</span></span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="keyword">return</span> <span class="title function_">reactive</span>(wrapper)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 测试</span></span><br><span class="line"><span class="keyword">let</span> age = <span class="title function_">ref</span>(<span class="number">1</span>)</span><br><span class="line"><span class="title function_">effect</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;res ==&gt;&#x27;</span>, age.<span class="property">value</span>)</span><br><span class="line">&#125;)</span><br><span class="line">age.<span class="property">value</span>++ <span class="comment">// 会触发响应式</span></span><br></pre></td></tr></table></figure>
+<pre><code class="javascript">function ref(val)&#123;
+  const wrapper = &#123;
+    value: val
+  &#125;
+  // 在 wrapper 上定义一个不可枚举属性 __v_isRef: true，用来区分是 ref 数据还是普通响应式数据
+  Object.defineProperty(wrapper, &#39;__v_isRef&#39;,&#123;
+    value: true
+  &#125;)
+  return reactive(wrapper)
+&#125;
 
+// 测试
+let age = ref(1)
+effect(() =&gt; &#123;
+  console.log(&#39;res ==&gt;&#39;, age.value)
+&#125;)
+age.value++ // 会触发响应式
+</code></pre>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>《vue.js设计与实现》</p>
 
   </div>

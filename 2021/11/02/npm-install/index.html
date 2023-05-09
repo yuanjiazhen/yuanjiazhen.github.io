@@ -270,8 +270,14 @@
 <li>常用配置：仓库地址、node-sass 依赖地址、自定义缓存目录等</li>
 <li>有关配置操作常见命令</li>
 </ol>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">npm config set &lt;key&gt; &lt;value&gt; [-g|--global]  // 配置参数</span><br><span class="line">npm config get &lt;key&gt;                        // 获取参数 key 对应的值</span><br><span class="line">npm config delete &lt;key&gt;                     // 根据 key 删除配置项</span><br><span class="line">npm config list [-l]                        // 显示 npm 所有配置参数信息</span><br><span class="line">npm config edit                             // 编辑配置文件</span><br><span class="line">npm get &lt;key&gt;                               //获取配置参数 key 的值</span><br><span class="line">npm set &lt;key&gt; &lt;value&gt; [-g|--global]         //给配置参数key设置值为value；</span><br></pre></td></tr></table></figure>
-
+<pre><code class="git">npm config set &lt;key&gt; &lt;value&gt; [-g|--global]  // 配置参数
+npm config get &lt;key&gt;                        // 获取参数 key 对应的值
+npm config delete &lt;key&gt;                     // 根据 key 删除配置项
+npm config list [-l]                        // 显示 npm 所有配置参数信息
+npm config edit                             // 编辑配置文件
+npm get &lt;key&gt;                               //获取配置参数 key 的值
+npm set &lt;key&gt; &lt;value&gt; [-g|--global]         //给配置参数key设置值为value；
+</code></pre>
 <h3 id="构建依赖树"><a href="#构建依赖树" class="headerlink" title="构建依赖树"></a>构建依赖树</h3><ol>
 <li>有 lock 文件：判断 lock 与 package.json 依赖版本是否一致，一致使用 lock 文件信息，反之根据 package.json 拉取远端依赖包信息</li>
 <li>npm 早期版本（&lt;3.x）：npm 按照 package.json 结构以递归的方式处理依赖<ul>
@@ -280,7 +286,24 @@
 </ul>
 </li>
 </ol>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// app package.json</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;name&quot;</span>: <span class="string">&quot;app&quot;</span>,</span><br><span class="line">  <span class="string">&quot;dependencies&quot;</span>: &#123;</span><br><span class="line">    <span class="string">&quot;buffer&quot;</span>: <span class="string">&quot;^1.0.0&quot;</span>,</span><br><span class="line">    <span class="string">&quot;ignore&quot;</span>: <span class="string">&quot;^1.0.0&quot;</span>,</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// buffer package.json</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;name&quot;</span>: <span class="string">&quot;buffer&quot;</span>,</span><br><span class="line">  <span class="string">&quot;dependencies&quot;</span>: &#123;</span><br><span class="line">    <span class="string">&quot;base64&quot;</span>: <span class="string">&quot;^1.0.0&quot;</span>,</span><br><span class="line">    <span class="string">&quot;ignore&quot;</span>: <span class="string">&quot;^1.0.0&quot;</span>,</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="javascript">// app package.json
+&#123;
+  &quot;name&quot;: &quot;app&quot;,
+  &quot;dependencies&quot;: &#123;
+    &quot;buffer&quot;: &quot;^1.0.0&quot;,
+    &quot;ignore&quot;: &quot;^1.0.0&quot;,
+  &#125;
+&#125;
+
+// buffer package.json
+&#123;
+  &quot;name&quot;: &quot;buffer&quot;,
+  &quot;dependencies&quot;: &#123;
+    &quot;base64&quot;: &quot;^1.0.0&quot;,
+    &quot;ignore&quot;: &quot;^1.0.0&quot;,
+  &#125;
+&#125;
+</code></pre>
 <img src="dependencies-1.jpeg" width=100% height=250 alt=alt />
 
 <ol start="2">
@@ -304,8 +327,36 @@
 </ul>
 </li>
 </ol>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;@babel/generator&quot;</span>: &#123;</span><br><span class="line">     <span class="comment">// 包版本</span></span><br><span class="line">     <span class="string">&quot;version&quot;</span>: <span class="string">&quot;7.20.14&quot;</span>,</span><br><span class="line">     <span class="comment">// 包安装来源</span></span><br><span class="line">     <span class="string">&quot;resolved&quot;</span>: <span class="string">&quot;https://registry.npmmirror.com/@babel/generator/-/generator-7.20.14.tgz&quot;</span>,</span><br><span class="line">     <span class="comment">// 包 hash 值，用于验证已安装软件包是否被改动过、是否失效</span></span><br><span class="line">     <span class="string">&quot;integrity&quot;</span>: <span class="string">&quot;sha512-AEmuXHdcD3A52HHXxaTmYlb8q/xMEhoRP67B3T4Oq7lbmSoqroMZzjnGj3+i1io3pdnF8iBYVu4Ilj+c4hBxYg==&quot;</span>,</span><br><span class="line">     <span class="string">&quot;dev&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">     <span class="comment">// 子依赖，与 package.json 中 dependencies 依赖项相同</span></span><br><span class="line">     <span class="string">&quot;requires&quot;</span>: &#123;</span><br><span class="line">       <span class="string">&quot;@babel/types&quot;</span>: <span class="string">&quot;^7.20.7&quot;</span>,</span><br><span class="line">       <span class="string">&quot;@jridgewell/gen-mapping&quot;</span>: <span class="string">&quot;^0.3.2&quot;</span>,</span><br><span class="line">       <span class="string">&quot;jsesc&quot;</span>: <span class="string">&quot;^2.5.1&quot;</span></span><br><span class="line">     &#125;,</span><br><span class="line">     <span class="comment">// 安装在子依赖 node_modules 中的依赖包</span></span><br><span class="line">     <span class="string">&quot;dependencies&quot;</span>: &#123;</span><br><span class="line">       <span class="string">&quot;@jridgewell/gen-mapping&quot;</span>: &#123;</span><br><span class="line">         <span class="string">&quot;version&quot;</span>: <span class="string">&quot;0.3.2&quot;</span>,</span><br><span class="line">         <span class="string">&quot;resolved&quot;</span>: <span class="string">&quot;https://registry.npmmirror.com/@jridgewell/gen-mapping/-/gen-mapping-0.3.2.tgz&quot;</span>,</span><br><span class="line">         <span class="string">&quot;integrity&quot;</span>: <span class="string">&quot;sha512-mh65xKQAzI6iBcFzwv28KVWSmCkdRBWoOh+bYQGW3+6OZvbbN3TqMGo5hqYxQniRcH9F2VZIoJCm4pa3BPDK/A==&quot;</span>,</span><br><span class="line">         <span class="string">&quot;dev&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">         <span class="string">&quot;requires&quot;</span>: &#123;</span><br><span class="line">           <span class="string">&quot;@jridgewell/set-array&quot;</span>: <span class="string">&quot;^1.0.1&quot;</span>,</span><br><span class="line">           <span class="string">&quot;@jridgewell/sourcemap-codec&quot;</span>: <span class="string">&quot;^1.4.10&quot;</span>,</span><br><span class="line">           <span class="string">&quot;@jridgewell/trace-mapping&quot;</span>: <span class="string">&quot;^0.3.9&quot;</span></span><br><span class="line">         &#125;</span><br><span class="line">       &#125;</span><br><span class="line">     &#125;</span><br><span class="line">   &#125;,</span><br></pre></td></tr></table></figure>
-
+<pre><code class="javascript"> &quot;@babel/generator&quot;: &#123;
+      // 包版本
+      &quot;version&quot;: &quot;7.20.14&quot;,
+      // 包安装来源
+      &quot;resolved&quot;: &quot;https://registry.npmmirror.com/@babel/generator/-/generator-7.20.14.tgz&quot;,
+      // 包 hash 值，用于验证已安装软件包是否被改动过、是否失效
+      &quot;integrity&quot;: &quot;sha512-AEmuXHdcD3A52HHXxaTmYlb8q/xMEhoRP67B3T4Oq7lbmSoqroMZzjnGj3+i1io3pdnF8iBYVu4Ilj+c4hBxYg==&quot;,
+      &quot;dev&quot;: true,
+      // 子依赖，与 package.json 中 dependencies 依赖项相同
+      &quot;requires&quot;: &#123;
+        &quot;@babel/types&quot;: &quot;^7.20.7&quot;,
+        &quot;@jridgewell/gen-mapping&quot;: &quot;^0.3.2&quot;,
+        &quot;jsesc&quot;: &quot;^2.5.1&quot;
+      &#125;,
+      // 安装在子依赖 node_modules 中的依赖包
+      &quot;dependencies&quot;: &#123;
+        &quot;@jridgewell/gen-mapping&quot;: &#123;
+          &quot;version&quot;: &quot;0.3.2&quot;,
+          &quot;resolved&quot;: &quot;https://registry.npmmirror.com/@jridgewell/gen-mapping/-/gen-mapping-0.3.2.tgz&quot;,
+          &quot;integrity&quot;: &quot;sha512-mh65xKQAzI6iBcFzwv28KVWSmCkdRBWoOh+bYQGW3+6OZvbbN3TqMGo5hqYxQniRcH9F2VZIoJCm4pa3BPDK/A==&quot;,
+          &quot;dev&quot;: true,
+          &quot;requires&quot;: &#123;
+            &quot;@jridgewell/set-array&quot;: &quot;^1.0.1&quot;,
+            &quot;@jridgewell/sourcemap-codec&quot;: &quot;^1.4.10&quot;,
+            &quot;@jridgewell/trace-mapping&quot;: &quot;^0.3.9&quot;
+          &#125;
+        &#125;
+      &#125;
+    &#125;,
+</code></pre>
 <ul>
 <li>lock 文件可显著加快依赖安装时间：在 lock 文件中缓存每个包的具体版本和下载链接，不需要去远程仓库查询，减少大量网络请求</li>
 </ul>
@@ -348,8 +399,24 @@
 <li>npm 和 yarn 由于都采用扁平化 node_modules 结构，所以都存在幽灵依赖的问题</li>
 <li>pnpm 将所有项目依赖包放在一个资源仓库，通过软链形成嵌套的 node_modules，解决了依赖冗余问题，并且未提升依赖，避免了幽灵依赖问题</li>
 </ol>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// pnpm node_modules 结构</span></span><br><span class="line">node_modules</span><br><span class="line">├── foo -&gt; ./.<span class="property">pnpm</span>/foo@<span class="number">1.0</span><span class="number">.0</span>/node_modules/foo</span><br><span class="line">└── .<span class="property">pnpm</span></span><br><span class="line">    ├── bar@<span class="number">1.0</span><span class="number">.0</span></span><br><span class="line">    │   └── node_modules</span><br><span class="line">    │       └── bar -&gt; &lt;store&gt;/bar</span><br><span class="line">    └── foo@<span class="number">1.0</span><span class="number">.0</span>（不将子依赖提升）</span><br><span class="line">        └── node_modules</span><br><span class="line">            ├── foo -&gt; &lt;store&gt;/foo</span><br><span class="line">            └── bar -&gt; ../../bar@<span class="number">1.0</span><span class="number">.0</span>/node_modules/bar</span><br><span class="line"></span><br><span class="line"><span class="comment">// yarn、npm 结构</span></span><br><span class="line">node_modules</span><br><span class="line">├── A</span><br><span class="line">├── B  </span><br><span class="line">└── foo（提升的子依赖）</span><br></pre></td></tr></table></figure>
+<pre><code class="javascript">// pnpm node_modules 结构
+node_modules
+├── foo -&gt; ./.pnpm/foo@1.0.0/node_modules/foo
+└── .pnpm
+    ├── bar@1.0.0
+    │   └── node_modules
+    │       └── bar -&gt; &lt;store&gt;/bar
+    └── foo@1.0.0（不将子依赖提升）
+        └── node_modules
+            ├── foo -&gt; &lt;store&gt;/foo
+            └── bar -&gt; ../../bar@1.0.0/node_modules/bar
 
+// yarn、npm 结构
+node_modules
+├── A
+├── B  
+└── foo（提升的子依赖）
+</code></pre>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1555982">npm install 原理分析</a></p>
 
   </div>

@@ -253,8 +253,9 @@
     
 
     <h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>React 合成事件是 React 模拟原生 DOM 事件所有能力的一个事件对象，即浏览器原生事件的跨浏览器包装器。根据 W3C 规范定义，React 所有事件都是合成的，但可以通过 <code>e.nativeEvent</code> 属性获取 DOM 事件</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> button = <span class="language-xml"><span class="tag">&lt;<span class="name">button</span> <span class="attr">onClick</span>=<span class="string">&#123;handleClick&#125;</span>&gt;</span>点击<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">handleClick</span> = (<span class="params">e</span>) =&gt; e.<span class="property">nativeEvent</span> <span class="comment">// 获取原生事件对象</span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="javascript">const button = &lt;button onClick=&#123;handleClick&#125;&gt;点击&lt;/button&gt;
+const handleClick = (e) =&gt; e.nativeEvent // 获取原生事件对象
+</code></pre>
 <h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><ol>
 <li>进行浏览器兼容：抹平不同浏览器事件对象的差异，将不同平台事件模拟合成事件</li>
 <li>节省内存：React 引入事件池（React17 后被废弃），在事件池中获取或释放事件对象。当事件触发，从事件池弹出，避免频繁创建和销毁（垃圾回收）</li>
@@ -274,8 +275,14 @@
 <ol>
 <li>事件注册：收集所有原生事件名称，并生成原生和合成事件的映射关系，同时生成所有合成事件对象构造函数</li>
 </ol>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 原生事件和合成事件映射表如下</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">onClick</span>: [<span class="string">&#x27;click&#x27;</span>],</span><br><span class="line">  <span class="attr">onClickCapture</span>: [<span class="string">&#x27;click&#x27;</span>],</span><br><span class="line">  <span class="attr">onChange</span>: [<span class="string">&#x27;blur&#x27;</span>,<span class="string">&#x27;change&#x27;</span>,...],</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="javascript">// 原生事件和合成事件映射表如下
+&#123;
+  onClick: [&#39;click&#39;],
+  onClickCapture: [&#39;click&#39;],
+  onChange: [&#39;blur&#39;,&#39;change&#39;,...],
+  ...
+&#125;
+</code></pre>
 <ol start="2">
 <li>事件绑定：遍历所有原生事件名称，给容器 root 注册所有捕获和冒泡事件</li>
 <li>事件触发：执行事件执行函数</li>
@@ -283,13 +290,62 @@
 <ul>
 <li>React 16 执行顺序：document捕获 &gt; 父元素原生捕获 &gt; 子元素原生捕获 &gt; 子元素原生冒泡 &gt; 父元素原生冒泡 &gt; 父元素React捕获 &gt; 子元素react捕获 &gt; 子元素react冒泡 &gt; 父元素react冒泡 &gt; document冒泡</li>
 </ul>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 模拟 react 16 合成事件代码</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">dispatchEvent</span>(<span class="params">event</span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(event, <span class="string">&#x27;event&#x27;</span>)</span><br><span class="line">  <span class="comment">// 收集事件</span></span><br><span class="line">  <span class="keyword">const</span> allNativeEvents = []</span><br><span class="line">  <span class="keyword">let</span> current = event.<span class="property">target</span></span><br><span class="line">  <span class="keyword">while</span> (current) &#123;</span><br><span class="line">    allNativeEvents.<span class="title function_">push</span>(current)</span><br><span class="line">    current = current.<span class="property">parentNode</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 模拟捕获和冒泡，其实在这个时候，原生的捕获阶段已经结束了</span></span><br><span class="line">  <span class="comment">// 捕获阶段</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> i = allNativeEvents.<span class="property">length</span> - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">    <span class="keyword">const</span> handler = allNativeEvents[i].<span class="property">onClickCapture</span></span><br><span class="line">    handler &amp;&amp; <span class="title function_">handler</span>()</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 冒泡阶段</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; allNativeEvents.<span class="property">length</span>; i++) &#123;</span><br><span class="line">    <span class="keyword">const</span> handler = allNativeEvents[i].<span class="property">onClick</span></span><br><span class="line">    handler &amp;&amp; <span class="title function_">handler</span>()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 注册React事件的事件委托</span></span><br><span class="line"><span class="variable language_">document</span>.<span class="title function_">addEventListener</span>(<span class="string">&#x27;click&#x27;</span>, dispatchEvent)</span><br></pre></td></tr></table></figure>
+<pre><code class="javascript">// 模拟 react 16 合成事件代码
+function dispatchEvent(event) &#123;
+  console.log(event, &#39;event&#39;)
+  // 收集事件
+  const allNativeEvents = []
+  let current = event.target
+  while (current) &#123;
+    allNativeEvents.push(current)
+    current = current.parentNode
+  &#125;
+  // 模拟捕获和冒泡，其实在这个时候，原生的捕获阶段已经结束了
+  // 捕获阶段
+  for (let i = allNativeEvents.length - 1; i &gt;= 0; i--) &#123;
+    const handler = allNativeEvents[i].onClickCapture
+    handler &amp;&amp; handler()
+  &#125;
+  // 冒泡阶段
+  for (let i = 0; i &lt; allNativeEvents.length; i++) &#123;
+    const handler = allNativeEvents[i].onClick
+    handler &amp;&amp; handler()
+  &#125;
+&#125;
 
+// 注册React事件的事件委托
+document.addEventListener(&#39;click&#39;, dispatchEvent)
+</code></pre>
 <ul>
 <li>react 17 执行顺序：document捕获 &gt; 父元素React捕获 &gt; 子元素react捕获 &gt; 父元素原生捕获 &gt; 子元素原生捕获 &gt; 子元素原生冒泡 &gt; 父元素原生冒泡 &gt; 子元素react冒泡 &gt; 父元素react冒泡 &gt; document冒泡</li>
 </ul>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 模拟 react 17 合成事件代码</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">dispatchEvent</span>(<span class="params">event, useCapture</span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(event, <span class="string">&#x27;event&#x27;</span>)</span><br><span class="line">  <span class="comment">// 收集事件</span></span><br><span class="line">  <span class="keyword">const</span> allNativeEvents = []</span><br><span class="line">  <span class="keyword">let</span> current = event.<span class="property">target</span></span><br><span class="line">  <span class="keyword">while</span> (current) &#123;</span><br><span class="line">    allNativeEvents.<span class="title function_">push</span>(current)</span><br><span class="line">    current = current.<span class="property">parentNode</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span>(useCapture)&#123;</span><br><span class="line">     <span class="comment">// 捕获阶段</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> i = allNativeEvents.<span class="property">length</span> - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">      <span class="keyword">const</span> handler = allNativeEvents[i].<span class="property">onClickCapture</span></span><br><span class="line">      handler &amp;&amp; <span class="title function_">handler</span>()</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    <span class="comment">// 冒泡阶段</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; allNativeEvents.<span class="property">length</span>; i++) &#123;</span><br><span class="line">      <span class="keyword">const</span> handler = allNativeEvents[i].<span class="property">onClick</span></span><br><span class="line">      handler &amp;&amp; <span class="title function_">handler</span>()</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">root.<span class="title function_">addEventListener</span>(<span class="string">&#x27;click&#x27;</span>, <span class="function">(<span class="params">event</span>)=&gt;</span><span class="title function_">dispatchEvent</span>(event,<span class="literal">true</span>),<span class="literal">true</span>)</span><br><span class="line">root.<span class="title function_">addEventListener</span>(<span class="string">&#x27;click&#x27;</span>, dispatchEvent)</span><br></pre></td></tr></table></figure>
-
+<pre><code class="javascript">// 模拟 react 17 合成事件代码
+function dispatchEvent(event, useCapture) &#123;
+  console.log(event, &#39;event&#39;)
+  // 收集事件
+  const allNativeEvents = []
+  let current = event.target
+  while (current) &#123;
+    allNativeEvents.push(current)
+    current = current.parentNode
+  &#125;
+  if(useCapture)&#123;
+     // 捕获阶段
+    for (let i = allNativeEvents.length - 1; i &gt;= 0; i--) &#123;
+      const handler = allNativeEvents[i].onClickCapture
+      handler &amp;&amp; handler()
+    &#125;
+  &#125;else&#123;
+    // 冒泡阶段
+    for (let i = 0; i &lt; allNativeEvents.length; i++) &#123;
+      const handler = allNativeEvents[i].onClick
+      handler &amp;&amp; handler()
+    &#125;
+  &#125;
+&#125;
+root.addEventListener(&#39;click&#39;, (event)=&gt;dispatchEvent(event,true),true)
+root.addEventListener(&#39;click&#39;, dispatchEvent)
+</code></pre>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.php.cn/website-design-ask-493889.html#:~:text=%E4%B8%80%E3%80%81%E4%BB%80%E4%B9%88%E6%98%AF%E5%90%88%E6%88%90%E4%BA%8B%E4%BB%B6%20React%20%E5%90%88%E6%88%90%E4%BA%8B%E4%BB%B6%EF%BC%88SyntheticEvent%EF%BC%89%E6%98%AF%20React%20%E6%A8%A1%E6%8B%9F%E5%8E%9F%E7%94%9F,DOM%20%E4%BA%8B%E4%BB%B6%E6%89%80%E6%9C%89%E8%83%BD%E5%8A%9B%E7%9A%84%E4%B8%80%E4%B8%AA%E4%BA%8B%E4%BB%B6%E5%AF%B9%E8%B1%A1%EF%BC%8C%E5%8D%B3%E6%B5%8F%E8%A7%88%E5%99%A8%E5%8E%9F%E7%94%9F%E4%BA%8B%E4%BB%B6%E7%9A%84%E8%B7%A8%E6%B5%8F%E8%A7%88%E5%99%A8%E5%8C%85%E8%A3%85%E5%99%A8%E3%80%82%20%E5%AE%83%E6%A0%B9%E6%8D%AE%20W3C%20%E8%A7%84%E8%8C%83%20%E6%9D%A5%E5%AE%9A%E4%B9%89%E5%90%88%E6%88%90%E4%BA%8B%E4%BB%B6%EF%BC%8C%E5%85%BC%E5%AE%B9%E6%89%80%E6%9C%89%E6%B5%8F%E8%A7%88%E5%99%A8%EF%BC%8C%E6%8B%A5%E6%9C%89%E4%B8%8E%E6%B5%8F%E8%A7%88%E5%99%A8%E5%8E%9F%E7%94%9F%E4%BA%8B%E4%BB%B6%E7%9B%B8%E5%90%8C%E7%9A%84%E6%8E%A5%E5%8F%A3%E3%80%82">react为什么要用合成事件</a><br><a target="_blank" rel="noopener" href="https://7kms.github.io/react-illustration-series/main/synthetic-event">图解React-合成事件</a></p>
 
   </div>

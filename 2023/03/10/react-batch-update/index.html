@@ -253,8 +253,20 @@
     
 
     <h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>批量更新是指 React 将多次 state 更新进行合并处理，最终只进行一次渲染，以获得更好的性能，如以下：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">App</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> [name, setName] = <span class="title function_">useState</span>(<span class="string">&#x27;&#x27;</span>)</span><br><span class="line">  <span class="keyword">const</span> [age, setAge] = <span class="title function_">useState</span>(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> <span class="title function_">handleClick</span> = (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">    <span class="comment">// setName、setAge 两次更新最终会批量处理，只触发一次更新渲染</span></span><br><span class="line">    <span class="title function_">setName</span>(<span class="string">&#x27;xiaoming&#x27;</span>)</span><br><span class="line">    <span class="title function_">setAge</span>(<span class="number">18</span>)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="language-xml"><span class="tag">&lt;<span class="name">button</span> <span class="attr">onClick</span>=<span class="string">&#123;handleClick&#125;</span>&gt;</span>&#123;name&#125;-&#123;age&#125;<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line">  )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="javascript">function App() &#123;
+  const [name, setName] = useState(&#39;&#39;)
+  const [age, setAge] = useState(0)
 
+  const handleClick = () =&gt; &#123;
+    // setName、setAge 两次更新最终会批量处理，只触发一次更新渲染
+    setName(&#39;xiaoming&#39;)
+    setAge(18)
+  &#125;
+  return (
+    &lt;button onClick=&#123;handleClick&#125;&gt;&#123;name&#125;-&#123;age&#125;&lt;/button&gt;
+  )
+&#125;
+</code></pre>
 <h2 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h2><ol>
 <li>可避免不必要渲染，提高组件渲染性能</li>
 </ol>
@@ -263,17 +275,94 @@
 <li>React 17 只在 React 事件处理函数中执行过程中进行批量更新，默认情况下，不处理 promises、setTimeout、原生事件处理函数等</li>
 <li>React 18 使用 <code>createRoot</code>(使用 <code>render</code> 和 v17 一致)会对所有更新都自动进行批量处理，包括 promises、setTimeout、原生事件处理函数等</li>
 </ol>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">App</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> [name, setName] = <span class="title function_">useState</span>(<span class="string">&#x27;&#x27;</span>)</span><br><span class="line">  <span class="keyword">const</span> [age, setAge] = <span class="title function_">useState</span>(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> <span class="title function_">handleClick</span> = (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">    <span class="comment">// React 17 fetchSomething 里面更新不会批量处理，会触发两次更新渲染</span></span><br><span class="line">    <span class="comment">// React 18 使用 createRoot fetchSomething 里面更新会批量处理，只触发一次更新渲染</span></span><br><span class="line">    <span class="title function_">fetchSomething</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="title function_">setName</span>(<span class="string">&#x27;xiaoming&#x27;</span>)</span><br><span class="line">      <span class="title function_">setAge</span>(<span class="number">18</span>)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="language-xml"><span class="tag">&lt;<span class="name">button</span> <span class="attr">onClick</span>=<span class="string">&#123;handleClick&#125;</span>&gt;</span>&#123;name&#125;-&#123;age&#125;<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line">  )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="javascript">function App() &#123;
+  const [name, setName] = useState(&#39;&#39;)
+  const [age, setAge] = useState(0)
 
+  const handleClick = () =&gt; &#123;
+    // React 17 fetchSomething 里面更新不会批量处理，会触发两次更新渲染
+    // React 18 使用 createRoot fetchSomething 里面更新会批量处理，只触发一次更新渲染
+    fetchSomething().then(() =&gt; &#123;
+      setName(&#39;xiaoming&#39;)
+      setAge(18)
+    &#125;)
+  &#125;
+  return (
+    &lt;button onClick=&#123;handleClick&#125;&gt;&#123;name&#125;-&#123;age&#125;&lt;/button&gt;
+  )
+&#125;
+</code></pre>
 <p>注意：React 18 自动批量更新对 Hook 通常没影响，但对 Class 会存在以下问题：Class 中是可以在两次更新中读取 state 的，如：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="title class_">React</span> <span class="keyword">from</span> <span class="string">&#x27;react&#x27;</span>;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">App</span> <span class="keyword">extends</span> <span class="title class_ inherited__">React.Component</span> &#123;</span><br><span class="line">  <span class="title function_">constructor</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="variable language_">super</span>();</span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">state</span> = &#123;</span><br><span class="line">      <span class="attr">count</span>: <span class="number">0</span>,</span><br><span class="line">      <span class="attr">flag</span>: <span class="literal">false</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="title function_">render</span>(<span class="params"></span>) &#123;</span><br><span class="line">    handleClick = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="title function_">setState</span>(<span class="function">(<span class="params">&#123; count &#125;</span>) =&gt;</span> (&#123; <span class="attr">count</span>: count + <span class="number">1</span> &#125;));</span><br><span class="line">        <span class="comment">// 当需要在两次 setState 中读取 count</span></span><br><span class="line">        <span class="comment">// React 17 class：&#123; count: 1, flag: false &#125;</span></span><br><span class="line">        <span class="comment">// React 18 class：&#123; count: 0, flag: false &#125;</span></span><br><span class="line">        <span class="comment">// 如果需要获取到 count 为 1，可用 flushSync 对上面的 setState 进行更新</span></span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="variable language_">this</span>.<span class="property">state</span>);</span><br><span class="line">        <span class="variable language_">this</span>.<span class="title function_">setState</span>(<span class="function">(<span class="params">&#123; flag &#125;</span>) =&gt;</span> (&#123; <span class="attr">flag</span>: !flag &#125;));</span><br><span class="line">      &#125;, <span class="number">0</span>);</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      <span class="language-xml"><span class="tag">&lt;<span class="name">button</span> <span class="attr">onClick</span>=<span class="string">&#123;handleClick&#125;</span>&gt;</span>&#123;name&#125;-&#123;age&#125;<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="javascript">import React from &#39;react&#39;;
+class App extends React.Component &#123;
+  constructor() &#123;
+    super();
+    this.state = &#123;
+      count: 0,
+      flag: false
+    &#125;
+  &#125;
+  render() &#123;
+    handleClick = () =&gt; &#123;
+      setTimeout(() =&gt; &#123;
+        this.setState((&#123; count &#125;) =&gt; (&#123; count: count + 1 &#125;));
+        // 当需要在两次 setState 中读取 count
+        // React 17 class：&#123; count: 1, flag: false &#125;
+        // React 18 class：&#123; count: 0, flag: false &#125;
+        // 如果需要获取到 count 为 1，可用 flushSync 对上面的 setState 进行更新
+        console.log(this.state);
+        this.setState((&#123; flag &#125;) =&gt; (&#123; flag: !flag &#125;));
+      &#125;, 0);
+    &#125;;
+    return (
+      &lt;button onClick=&#123;handleClick&#125;&gt;&#123;name&#125;-&#123;age&#125;&lt;/button&gt;
+    )
+  &#125;
+&#125;
+</code></pre>
 <h2 id="强制批量更新"><a href="#强制批量更新" class="headerlink" title="强制批量更新"></a>强制批量更新</h2><p>React 17 如果想在不支持批量更新事件中强制批量更新，可以使用 <code>unstable_batchedUpdates</code>，虽然 <code>unstable_batchedUpdates</code> 在 React 18 可能用不到，但官方还未在 18 中废除这个 API，当主流库不再依赖于它之后，可能在未来的某个版本会删除它</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; unstable_batchedUpdates &#125; <span class="keyword">from</span> <span class="string">&#x27;react-dom&#x27;</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">App</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> [name, setName] = <span class="title function_">useState</span>(<span class="string">&#x27;&#x27;</span>)</span><br><span class="line">  <span class="keyword">const</span> [age, setAge] = <span class="title function_">useState</span>(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> <span class="title function_">handleClick</span> = (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">    <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="title function_">unstable_batchedUpdates</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="title function_">setName</span>(<span class="string">&#x27;xiaoming&#x27;</span>)<span class="comment">// 触发一次 render</span></span><br><span class="line">        <span class="title function_">setAge</span>(<span class="number">18</span>)<span class="comment">// 触发一次 render</span></span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;, <span class="number">0</span>)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="language-xml"><span class="tag">&lt;<span class="name">button</span> <span class="attr">onClick</span>=<span class="string">&#123;handleClick&#125;</span>&gt;</span>&#123;name&#125;-&#123;age&#125;<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line">  )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="javascript">import &#123; unstable_batchedUpdates &#125; from &#39;react-dom&#39;
+function App() &#123;
+  const [name, setName] = useState(&#39;&#39;)
+  const [age, setAge] = useState(0)
 
+  const handleClick = () =&gt; &#123;
+    setTimeout(() =&gt; &#123;
+      unstable_batchedUpdates(() =&gt; &#123;
+        setName(&#39;xiaoming&#39;)// 触发一次 render
+        setAge(18)// 触发一次 render
+      &#125;)
+    &#125;, 0)
+  &#125;
+  return (
+    &lt;button onClick=&#123;handleClick&#125;&gt;&#123;name&#125;-&#123;age&#125;&lt;/button&gt;
+  )
+&#125;
+</code></pre>
 <h2 id="强制不批量更新"><a href="#强制不批量更新" class="headerlink" title="强制不批量更新"></a>强制不批量更新</h2><p>通常批量更新是安全的，但有些情况可能依赖于在状态更改后立即从 DOM 中读取某些内容，这时可以使用 <code>ReactDOM.flushSync()</code>强制不批量更新</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; flushSync &#125; <span class="keyword">from</span> <span class="string">&#x27;react-dom&#x27;</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">App</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> [name, setName] = <span class="title function_">useState</span>(<span class="string">&#x27;&#x27;</span>)</span><br><span class="line">  <span class="keyword">const</span> [age, setAge] = <span class="title function_">useState</span>(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> <span class="title function_">handleClick</span> = (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">    <span class="title function_">flushSync</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">// 触发一次 render</span></span><br><span class="line">      <span class="title function_">setName</span>(<span class="string">&#x27;xiaoming&#x27;</span>)</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="comment">// 当 setAge 依赖 setName 的结果，可以使用 flushSync 来避免批量更新</span></span><br><span class="line">    <span class="title function_">flushSync</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (name === <span class="string">&#x27;xiaoming&#x27;</span>) &#123;</span><br><span class="line">        <span class="comment">// 触发一次 render</span></span><br><span class="line">        <span class="title function_">setAge</span>(<span class="number">18</span>)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="language-xml"><span class="tag">&lt;<span class="name">button</span> <span class="attr">onClick</span>=<span class="string">&#123;handleClick&#125;</span>&gt;</span>&#123;name&#125;-&#123;age&#125;<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line">  )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="javascript">import &#123; flushSync &#125; from &#39;react-dom&#39;
+function App() &#123;
+  const [name, setName] = useState(&#39;&#39;)
+  const [age, setAge] = useState(0)
 
+  const handleClick = () =&gt; &#123;
+    flushSync(() =&gt; &#123;
+      // 触发一次 render
+      setName(&#39;xiaoming&#39;)
+    &#125;)
+    // 当 setAge 依赖 setName 的结果，可以使用 flushSync 来避免批量更新
+    flushSync(() =&gt; &#123;
+      if (name === &#39;xiaoming&#39;) &#123;
+        // 触发一次 render
+        setAge(18)
+      &#125;
+    &#125;)
+  &#125;
+  return (
+    &lt;button onClick=&#123;handleClick&#125;&gt;&#123;name&#125;-&#123;age&#125;&lt;/button&gt;
+  )
+&#125;
+</code></pre>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://juejin.cn/post/6982433531792195621">React 18 批量更新减少渲染次数</a></p>
 
   </div>

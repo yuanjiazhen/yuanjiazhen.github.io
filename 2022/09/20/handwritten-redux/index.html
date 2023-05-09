@@ -261,23 +261,122 @@
 
 <p>store：存储 state 的中心仓库，可以对数据源进行统一管理，全局只有一个 store<br>action：将数据从应用传到 store 的有效载荷<br>reducer：reducer 是一个纯函数，根据 action 对象内的信息来改变 store 内的数据</p>
 <p>Redux 本身是一个单纯的状态机，Store 存放所有状态，Action 是一个改变状态的通知，Reducer 接收到通知来改 Store 中对应的状态</p>
-<h2 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; createStore &#125; <span class="keyword">from</span> <span class="string">&#x27;redux&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> initState = &#123;</span><br><span class="line">  <span class="attr">milk</span>: <span class="number">0</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">reducer</span>(<span class="params">state = initState, action</span>) &#123;</span><br><span class="line">  <span class="keyword">switch</span> (action.<span class="property">type</span>) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">&#x27;PUT_MILK&#x27;</span>:</span><br><span class="line">      <span class="keyword">return</span> &#123;...state, <span class="attr">milk</span>: state.<span class="property">milk</span> + action.<span class="property">count</span>&#125;;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">&#x27;TAKE_MILK&#x27;</span>:</span><br><span class="line">      <span class="keyword">return</span> &#123;...state, <span class="attr">milk</span>: state.<span class="property">milk</span> - action.<span class="property">count</span>&#125;;</span><br><span class="line">    <span class="attr">default</span>:</span><br><span class="line">      <span class="keyword">return</span> state;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> store = <span class="title function_">createStore</span>(reducer);</span><br><span class="line"></span><br><span class="line"><span class="comment">// subscribe其实就是订阅store的变化，一旦store发生了变化，传入的回调函数就会被调用</span></span><br><span class="line"><span class="comment">// 如果是结合页面更新，更新的操作就是在这里执行</span></span><br><span class="line">store.<span class="title function_">subscribe</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(store.<span class="title function_">getState</span>()));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 将action发出去要用dispatch</span></span><br><span class="line">store.<span class="title function_">dispatch</span>(&#123; <span class="attr">type</span>: <span class="string">&#x27;PUT_MILK&#x27;</span> &#125;);    <span class="comment">// milk: 1</span></span><br><span class="line">store.<span class="title function_">dispatch</span>(&#123; <span class="attr">type</span>: <span class="string">&#x27;PUT_MILK&#x27;</span> &#125;);    <span class="comment">// milk: 2</span></span><br><span class="line">store.<span class="title function_">dispatch</span>(&#123; <span class="attr">type</span>: <span class="string">&#x27;TAKE_MILK&#x27;</span> &#125;);   <span class="comment">// milk: 1</span></span><br></pre></td></tr></table></figure>
+<h2 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h2><pre><code class="javascript">import &#123; createStore &#125; from &#39;redux&#39;;
 
+const initState = &#123;
+  milk: 0
+&#125;;
+
+function reducer(state = initState, action) &#123;
+  switch (action.type) &#123;
+    case &#39;PUT_MILK&#39;:
+      return &#123;...state, milk: state.milk + action.count&#125;;
+    case &#39;TAKE_MILK&#39;:
+      return &#123;...state, milk: state.milk - action.count&#125;;
+    default:
+      return state;
+  &#125;
+&#125;
+
+let store = createStore(reducer);
+
+// subscribe其实就是订阅store的变化，一旦store发生了变化，传入的回调函数就会被调用
+// 如果是结合页面更新，更新的操作就是在这里执行
+store.subscribe(() =&gt; console.log(store.getState()));
+
+// 将action发出去要用dispatch
+store.dispatch(&#123; type: &#39;PUT_MILK&#39; &#125;);    // milk: 1
+store.dispatch(&#123; type: &#39;PUT_MILK&#39; &#125;);    // milk: 2
+store.dispatch(&#123; type: &#39;TAKE_MILK&#39; &#125;);   // milk: 1
+</code></pre>
 <h2 id="手写-Redux"><a href="#手写-Redux" class="headerlink" title="手写 Redux"></a>手写 Redux</h2><p>核心原理：发布订阅模式</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">createStore</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">let</span> state <span class="comment">// store 中所有的状态</span></span><br><span class="line">  <span class="keyword">let</span> listeners = []  <span class="comment">// 存储所有注册的回调</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 订阅所有更新</span></span><br><span class="line">  <span class="keyword">function</span> <span class="title function_">subscribe</span>(<span class="params">callback</span>) &#123;</span><br><span class="line">    listeners.<span class="title function_">push</span>(callback)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 派发更新通知: 执行所有的订阅了的回调</span></span><br><span class="line">  <span class="keyword">function</span> <span class="title function_">dispatch</span>(<span class="params">action</span>) &#123;</span><br><span class="line">    <span class="comment">// 发布事件前，更新 state 状态</span></span><br><span class="line">    state = <span class="title function_">reducer</span>(state, action);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> cb <span class="keyword">of</span> listeners) &#123;</span><br><span class="line">      <span class="title function_">cb</span>()</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 获取 store 中所有的状态</span></span><br><span class="line">  <span class="keyword">function</span> <span class="title function_">getState</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> state</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 返回 createStore 内的方法</span></span><br><span class="line">  <span class="keyword">const</span> store = &#123;</span><br><span class="line">    subscribe,</span><br><span class="line">    dispatch,</span><br><span class="line">    getState</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> store</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="javascript">function createStore() &#123;
+  let state // store 中所有的状态
+  let listeners = []  // 存储所有注册的回调
 
+  // 订阅所有更新
+  function subscribe(callback) &#123;
+    listeners.push(callback)
+  &#125;
+
+  // 派发更新通知: 执行所有的订阅了的回调
+  function dispatch(action) &#123;
+    // 发布事件前，更新 state 状态
+    state = reducer(state, action);
+    for (const cb of listeners) &#123;
+      cb()
+    &#125;
+  &#125;
+
+  // 获取 store 中所有的状态
+  function getState() &#123;
+    return state
+  &#125;
+
+  // 返回 createStore 内的方法
+  const store = &#123;
+    subscribe,
+    dispatch,
+    getState
+  &#125;
+  return store
+&#125;
+</code></pre>
 <h2 id="Middleware"><a href="#Middleware" class="headerlink" title="Middleware"></a>Middleware</h2><p>中间件 middeleware 执行的时机是在 dispatch 之前，其实就是拦截 dispatch，先注册 middeleware 执行之后再继续 dispatch 操作</p>
 <img src="img-3.jpg" width=100% height=400 alt=alt />
 
 <p>applyMiddleware 的作用是将 middeleware 串联起来进行链式调用</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; createStore, applyMiddleware &#125; <span class="keyword">from</span> <span class="string">&#x27;redux&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> thunk <span class="keyword">from</span> <span class="string">&#x27;redux-thunk&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 中间件 thunk 的使用</span></span><br><span class="line"><span class="keyword">const</span> store = <span class="title function_">createStore</span>(reducer, <span class="title function_">applyMiddleware</span>(thunk));</span><br></pre></td></tr></table></figure>
+<pre><code class="javascript">import &#123; createStore, applyMiddleware &#125; from &#39;redux&#39;;
+import thunk from &#39;redux-thunk&#39;;
 
+// 中间件 thunk 的使用
+const store = createStore(reducer, applyMiddleware(thunk));
+</code></pre>
 <h2 id="API"><a href="#API" class="headerlink" title="API"></a>API</h2><h3 id="combineReducers"><a href="#combineReducers" class="headerlink" title="combineReducers"></a>combineReducers</h3><p>作用：组合不同模块的 reducer<br>基本用法：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; combineReducers &#125; <span class="keyword">from</span> <span class="string">&#x27;redux&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> count = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">countReducer</span>(<span class="params">state = count, action</span>) &#123;</span><br><span class="line">  <span class="keyword">switch</span> (action.<span class="property">type</span>) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">&#x27;ADD&#x27;</span>:</span><br><span class="line">      <span class="keyword">return</span> count++;</span><br><span class="line">    <span class="attr">default</span>:</span><br><span class="line">      <span class="keyword">return</span> state;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> name = <span class="string">&#x27;li&#x27;</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">nameReducer</span>(<span class="params">state = name, action</span>) &#123;</span><br><span class="line">  <span class="keyword">switch</span> (action.<span class="property">type</span>) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">&#x27;CHANGE_NAME&#x27;</span>:</span><br><span class="line">      <span class="keyword">return</span> action.<span class="property">name</span></span><br><span class="line">    <span class="attr">default</span>:</span><br><span class="line">      <span class="keyword">return</span> state;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用 combineReducers 组合两个 reducer</span></span><br><span class="line"><span class="keyword">const</span> reducer = <span class="title function_">combineReducers</span>(&#123; <span class="attr">countState</span>: countReducer, <span class="attr">nameState</span>: nameReducer &#125;);</span><br></pre></td></tr></table></figure>
+<pre><code class="javascript">import &#123; combineReducers &#125; from &#39;redux&#39;;
 
+const count = 0;
+function countReducer(state = count, action) &#123;
+  switch (action.type) &#123;
+    case &#39;ADD&#39;:
+      return count++;
+    default:
+      return state;
+  &#125;
+&#125;
+
+const name = &#39;li&#39;
+function nameReducer(state = name, action) &#123;
+  switch (action.type) &#123;
+    case &#39;CHANGE_NAME&#39;:
+      return action.name
+    default:
+      return state;
+  &#125;
+&#125;
+
+// 使用 combineReducers 组合两个 reducer
+const reducer = combineReducers(&#123; countState: countReducer, nameState: nameReducer &#125;);
+</code></pre>
 <p>手写基础版 combineReducers</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">combineReducers</span>(<span class="params">reducerMap</span>) &#123;</span><br><span class="line">  <span class="comment">// reducerMap 为多个键值对的 reducer，如 &#123; countState: countReducer, nameState: nameReducer &#125;</span></span><br><span class="line">  <span class="keyword">const</span> reducerKeys = <span class="title class_">Object</span>.<span class="title function_">keys</span>(reducerMap)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> <span class="title function_">reducer</span> = (<span class="params">state = &#123;&#125;, action</span>) =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> newState = &#123;&#125;</span><br><span class="line">    <span class="comment">// 将每个键值对的 reducer 返回的 state 组装好返回</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> key <span class="keyword">of</span> reducerKeys) &#123;</span><br><span class="line">      <span class="keyword">const</span> currentReducer = reducerMap[key]</span><br><span class="line">      <span class="keyword">const</span> prevState = state[key]</span><br><span class="line">      newState[key] = <span class="title function_">currentReducer</span>(prevState, action)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> newState</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 返回普通结构的 reducer</span></span><br><span class="line">  <span class="keyword">return</span> reducer</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="javascript">function combineReducers(reducerMap) &#123;
+  // reducerMap 为多个键值对的 reducer，如 &#123; countState: countReducer, nameState: nameReducer &#125;
+  const reducerKeys = Object.keys(reducerMap)
 
+  const reducer = (state = &#123;&#125;, action) =&gt; &#123;
+    const newState = &#123;&#125;
+    // 将每个键值对的 reducer 返回的 state 组装好返回
+    for (const key of reducerKeys) &#123;
+      const currentReducer = reducerMap[key]
+      const prevState = state[key]
+      newState[key] = currentReducer(prevState, action)
+    &#125;
+    return newState
+  &#125;
+  // 返回普通结构的 reducer
+  return reducer
+&#125;
+</code></pre>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://juejin.cn/post/6975760113772527624">redux和react-redux</a><br><a target="_blank" rel="noopener" href="https://juejin.cn/post/6845166891682512909">手写一个Redux，深入理解其原理</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/144222700">Redux 图解原理</a></p>
 
   </div>

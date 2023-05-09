@@ -253,8 +253,16 @@
     
 
     <h2 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h2><p>React Diff 存在 update 组件中，对于 mount 组件是不进入 diff 流程的</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">reconcileChildren</span>(<span class="params">current, workInProgress, nextChildren, renderLanes</span>)&#123;</span><br><span class="line">  <span class="keyword">if</span>(current === <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="comment">// mount 时调用 mountChildFibers 不进行 diff</span></span><br><span class="line">    workInProgress.<span class="property">child</span> = <span class="title function_">mountChildFibers</span>(workInProgress, <span class="literal">null</span>, nextChildren, renderLanes);</span><br><span class="line">  &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    <span class="comment">// update 时调用 reconcileChildFibers 进行 diff</span></span><br><span class="line">    workInProgress.<span class="property">child</span> = <span class="title function_">reconcileChildFibers</span>(workInProgress, current.<span class="property">child</span>, nextChildren, renderLanes);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="javascript">function reconcileChildren(current, workInProgress, nextChildren, renderLanes)&#123;
+  if(current === null) &#123;
+    // mount 时调用 mountChildFibers 不进行 diff
+    workInProgress.child = mountChildFibers(workInProgress, null, nextChildren, renderLanes);
+  &#125;else&#123;
+    // update 时调用 reconcileChildFibers 进行 diff
+    workInProgress.child = reconcileChildFibers(workInProgress, current.child, nextChildren, renderLanes);
+  &#125;
+&#125;
+</code></pre>
 <p>对于 update 组件，React 会把当前组件与上次更新时对应的 Fiber 节点进行比较，找出变化的部分进行更新，避免页面大面积重新渲染，减少性能开销，查找变化 Fiber 节点的过程就叫 diff</p>
 <p>一个 DOM 节点在某一时刻最多会有 3 个节点和他相关，Diff 本质是对比 JSX 对象和 current Fiber 生成 wip Fiber</p>
 <ul>
@@ -268,15 +276,52 @@
 <li>规则 2：两个不同类型元素会产生不同的树，如 div–&gt;p，React 会销毁 div 及其子孙元素，并新建 p 及其字段元素</li>
 <li>规则 3：开发者可以通过 key 来暗示哪些子元素在不同渲染下能够保持稳定</li>
 </ol>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 当没有 key 时会命中规则 2，使得 div 子元素不能复用</span></span><br><span class="line"><span class="comment">// 当有 key 时会命中规则 3，使得 div 子元素能复用，只需交换顺序</span></span><br><span class="line"><span class="comment">// 更新前</span></span><br><span class="line">&lt;div&gt;</span><br><span class="line">  <span class="language-xml"><span class="tag">&lt;<span class="name">p</span> <span class="attr">key</span>=<span class="string">&#x27;1&#x27;</span>&gt;</span>1<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span></span><br><span class="line">  <span class="language-xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">key</span>=<span class="string">&#x27;2&#x27;</span>&gt;</span>2<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">&lt;/div&gt;</span><br><span class="line"><span class="comment">// 更新后</span></span><br><span class="line"><span class="language-xml"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">key</span>=<span class="string">&#x27;2&#x27;</span>&gt;</span>2<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">   <span class="tag">&lt;<span class="name">p</span> <span class="attr">key</span>=<span class="string">&#x27;1&#x27;</span>&gt;</span>1<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span></span><br><span class="line"><span class="language-xml"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="javascript">// 当没有 key 时会命中规则 2，使得 div 子元素不能复用
+// 当有 key 时会命中规则 3，使得 div 子元素能复用，只需交换顺序
+// 更新前
+&lt;div&gt;
+  &lt;p key=&#39;1&#39;&gt;1&lt;/p&gt;
+  &lt;div key=&#39;2&#39;&gt;2&lt;/div&gt;
+&lt;/div&gt;
+// 更新后
+&lt;div&gt;
+  &lt;div key=&#39;2&#39;&gt;2&lt;/div&gt;
+   &lt;p key=&#39;1&#39;&gt;1&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
 <h2 id="Diff-入口"><a href="#Diff-入口" class="headerlink" title="Diff 入口"></a>Diff 入口</h2><p>diff 入口函数是 <code>reconcileChildFibers</code>，从 <code>reconcileChildFibers</code>源码可以发现，diff 时会根据 newChild 类型采用不用的处理函数</p>
 <ul>
 <li>单节点：当 newChild 类型为 object、number、string，代表同级只有一个节点</li>
 <li>多节点：当 newChild 类型为 Array，代表同级有多个节点</li>
 </ul>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">reconcileChildFibers</span>(<span class="params">returnFiber, currentFirstChild, newChild, lanes</span>) &#123;</span><br><span class="line">  <span class="comment">// ...省略</span></span><br><span class="line">  <span class="keyword">var</span> isObject = <span class="keyword">typeof</span> newChild === <span class="string">&#x27;object&#x27;</span> &amp;&amp; newChild !== <span class="literal">null</span>;</span><br><span class="line">  <span class="comment">// 进行单节点 diff</span></span><br><span class="line">  <span class="keyword">if</span> (isObject) &#123;</span><br><span class="line">    <span class="keyword">switch</span> (newChild.<span class="property">$$typeof</span>) &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="attr">REACT_ELEMENT_TYPE</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="title function_">placeSingleChild</span>(<span class="title function_">reconcileSingleElement</span>(returnFiber, currentFirstChild, newChild, lanes));</span><br><span class="line">      <span class="comment">// ...省略</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> newChild === <span class="string">&#x27;string&#x27;</span> || <span class="keyword">typeof</span> newChild === <span class="string">&#x27;number&#x27;</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="title function_">placeSingleChild</span>(<span class="title function_">reconcileSingleTextNode</span>(returnFiber, currentFirstChild, <span class="string">&#x27;&#x27;</span> + newChild, lanes));</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 进行多节点 diff </span></span><br><span class="line">  <span class="keyword">if</span> (<span class="title function_">isArray$1</span>(newChild)) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="title function_">reconcileChildrenArray</span>(returnFiber, currentFirstChild, newChild, lanes);</span><br><span class="line">    <span class="comment">// ...省略</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// ...省略</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 以上都没有命中，删除节点</span></span><br><span class="line">  <span class="keyword">return</span> <span class="title function_">deleteRemainingChildren</span>(returnFiber, currentFirstChild);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="javascript">function reconcileChildFibers(returnFiber, currentFirstChild, newChild, lanes) &#123;
+  // ...省略
+  var isObject = typeof newChild === &#39;object&#39; &amp;&amp; newChild !== null;
+  // 进行单节点 diff
+  if (isObject) &#123;
+    switch (newChild.$$typeof) &#123;
+      case REACT_ELEMENT_TYPE:
+        return placeSingleChild(reconcileSingleElement(returnFiber, currentFirstChild, newChild, lanes));
+      // ...省略
+    &#125;
+  &#125;
+  if (typeof newChild === &#39;string&#39; || typeof newChild === &#39;number&#39;) &#123;
+    return placeSingleChild(reconcileSingleTextNode(returnFiber, currentFirstChild, &#39;&#39; + newChild, lanes));
+  &#125;
 
+
+  // 进行多节点 diff 
+  if (isArray$1(newChild)) &#123;
+    return reconcileChildrenArray(returnFiber, currentFirstChild, newChild, lanes);
+    // ...省略
+  &#125;
+
+  // ...省略
+
+  // 以上都没有命中，删除节点
+  return deleteRemainingChildren(returnFiber, currentFirstChild);
+&#125;
+</code></pre>
 <h2 id="单节点-Diff"><a href="#单节点-Diff" class="headerlink" title="单节点 Diff"></a>单节点 Diff</h2><p>上述提到对于 newChild 类型为 object、number、string 会调用 <code>reconcileSingleElement</code> 或 <code>reconcileSingleTextNode</code> 进入单节点 diff 流程，以 <code>reconcileSingleElement</code> 为例，整体流程如下：</p>
 <ol>
 <li>对于 current Fiber 树不断进行 while 遍历查找 Fiber 节点，并进行 diff</li>
@@ -299,8 +344,48 @@
 <ol start="4">
 <li>当 key 或 type 不同时，根据新 element 元素创建新 Fiber 节点，返回新 Fiber 节点</li>
 </ol>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">reconcileSingleElement</span>(<span class="params">returnFiber, currentFirstChild, element, lanes</span>) &#123;</span><br><span class="line">  <span class="keyword">var</span> key = element.<span class="property">key</span>;</span><br><span class="line">  <span class="keyword">var</span> child = currentFirstChild; <span class="comment">// 与视图 DOM 对应的 current Fiber</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">while</span> (child !== <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="comment">// 非列表元素，key 一般都为 null, 则 null === null 也会进入 key 相等流程</span></span><br><span class="line">    <span class="keyword">if</span> (child.<span class="property">key</span> === key) &#123;</span><br><span class="line">      <span class="comment">// key相同，进一步比较 type 是否相同</span></span><br><span class="line">      <span class="keyword">switch</span> (child.<span class="property">tag</span>) &#123;</span><br><span class="line">        <span class="comment">// ...省略</span></span><br><span class="line">        <span class="attr">default</span>: &#123;</span><br><span class="line">          <span class="keyword">if</span> (child.<span class="property">elementType</span> === element.<span class="property">type</span>) &#123;</span><br><span class="line">            <span class="comment">// type 相同，可复用</span></span><br><span class="line">            <span class="comment">// 将该节点的兄弟节点标记为删除</span></span><br><span class="line">            <span class="title function_">deleteRemainingChildren</span>(returnFiber, child.<span class="property">sibling</span>);</span><br><span class="line">            <span class="comment">// 克隆一份当前 Fiber，并更新节点 props 属性，返回 Fiber</span></span><br><span class="line">            <span class="keyword">var</span> _existing3 = <span class="title function_">useFiber</span>(child, element.<span class="property">props</span>);</span><br><span class="line">            <span class="comment">// ...省略</span></span><br><span class="line">            <span class="keyword">return</span> _existing3</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="comment">// type 不同则跳出 switch</span></span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// key 相同但 type 不同：将该 Fiber 节点及其兄弟节点标记为删除</span></span><br><span class="line">      <span class="title function_">deleteRemainingChildren</span>(returnFiber, child);</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="comment">// key 不同，将该 Fiber 标记为删除</span></span><br><span class="line">      <span class="title function_">deleteChild</span>(returnFiber, child);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 继续遍历查找</span></span><br><span class="line">    child = child.<span class="property">sibling</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 当 key 或 type 不相同时，根据新 element 元素创建新 Fiber(created) 并返回</span></span><br><span class="line">  <span class="comment">// ...省略 created 创建相关代码</span></span><br><span class="line">  <span class="keyword">return</span> created</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="javascript">function reconcileSingleElement(returnFiber, currentFirstChild, element, lanes) &#123;
+  var key = element.key;
+  var child = currentFirstChild; // 与视图 DOM 对应的 current Fiber
 
+  while (child !== null) &#123;
+    // 非列表元素，key 一般都为 null, 则 null === null 也会进入 key 相等流程
+    if (child.key === key) &#123;
+      // key相同，进一步比较 type 是否相同
+      switch (child.tag) &#123;
+        // ...省略
+        default: &#123;
+          if (child.elementType === element.type) &#123;
+            // type 相同，可复用
+            // 将该节点的兄弟节点标记为删除
+            deleteRemainingChildren(returnFiber, child.sibling);
+            // 克隆一份当前 Fiber，并更新节点 props 属性，返回 Fiber
+            var _existing3 = useFiber(child, element.props);
+            // ...省略
+            return _existing3
+          &#125;
+          // type 不同则跳出 switch
+          break;
+        &#125;
+      &#125;
+
+      // key 相同但 type 不同：将该 Fiber 节点及其兄弟节点标记为删除
+      deleteRemainingChildren(returnFiber, child);
+      break;
+
+    &#125; else &#123;
+      // key 不同，将该 Fiber 标记为删除
+      deleteChild(returnFiber, child);
+    &#125;
+    // 继续遍历查找
+    child = child.sibling;
+  &#125;
+
+  // 当 key 或 type 不相同时，根据新 element 元素创建新 Fiber(created) 并返回
+  // ...省略 created 创建相关代码
+  return created
+&#125;
+</code></pre>
 <p>注意删除节点的两个函数 <code>deleteChild</code> 和 <code>deleteRemainingChildren</code>:</p>
 <ul>
 <li>deleteChild：当 key 不同时，仅代表当前 fiber 不用被复用，其兄弟 fiber 还可以继续 diff，看有没复用的可能，所以只需标记当前 fiber 删除</li>
@@ -335,8 +420,119 @@
 <li>第一轮：处理更新节点，找出可复用的节点</li>
 <li>第二轮：对第一轮遍历结果分情况处理余下的节点</li>
 </ol>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">reconcileChildrenArray</span>(<span class="params">returnFiber, currentFirstChild, newChildren, lanes</span>) &#123;<span class="keyword">function</span> <span class="title function_">reconcileChildrenArray</span>(<span class="params">returnFiber, currentFirstChild, newChildren, lanes</span>) &#123;</span><br><span class="line">  <span class="keyword">var</span> oldFiber = currentFirstChild; <span class="comment">// 旧节点 current Fiber</span></span><br><span class="line">  <span class="keyword">var</span> lastPlacedIndex = <span class="number">0</span>; <span class="comment">// 指的上一个可以复用的，不需要移动的节点的老索引</span></span><br><span class="line">  <span class="keyword">var</span> newIdx = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 第一轮遍历</span></span><br><span class="line">  <span class="keyword">for</span> (; oldFiber !== <span class="literal">null</span> &amp;&amp; newIdx &lt; newChildren.<span class="property">length</span>; newIdx++) &#123;<span class="comment">// 当 oldFiber 或 newChildren遍历完，结束一轮遍历</span></span><br><span class="line">    <span class="comment">// ...省略</span></span><br><span class="line">    <span class="comment">// 1. updateSlot key 不同，返回 null</span></span><br><span class="line">    <span class="comment">// 2. updateSlot key 相同，type 相同，复用旧节点，返回旧节点</span></span><br><span class="line">    <span class="keyword">var</span> newFiber = <span class="title function_">updateSlot</span>(returnFiber, oldFiber, newChildren[newIdx], lanes);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// newFiber 为 null, 当前节点不可复用，跳出第一轮循环</span></span><br><span class="line">    <span class="keyword">if</span> (newFiber === <span class="literal">null</span>) &#123;</span><br><span class="line">      <span class="keyword">if</span> (oldFiber === <span class="literal">null</span>) &#123;</span><br><span class="line">        oldFiber = nextOldFiber;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (shouldTrackSideEffects) &#123;</span><br><span class="line">      <span class="keyword">if</span> (oldFiber &amp;&amp; newFiber.<span class="property">alternate</span> === <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="comment">// key 相同，type 不同，旧节点标记删除，继续遍历</span></span><br><span class="line">        <span class="title function_">deleteChild</span>(returnFiber, oldFiber);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 更新最后一个节点移动的位置索引</span></span><br><span class="line">    lastPlacedIndex = <span class="title function_">placeChild</span>(newFiber, lastPlacedIndex, newIdx);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ...省略</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 对第一轮遍历处理情况，进行第二轮处理</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 情况2：当 newChildren 遍历完，剩下的 oldFiber 没用了，均标记删除</span></span><br><span class="line">  <span class="keyword">if</span> (newIdx === newChildren.<span class="property">length</span>) &#123;</span><br><span class="line">    <span class="title function_">deleteRemainingChildren</span>(returnFiber, oldFiber);</span><br><span class="line">    <span class="keyword">return</span> resultingFirstChild;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 情况3：oldFiber 都遍历完，将剩余的 newChildren 都遍历生成 fiber 标记 Placement</span></span><br><span class="line">  <span class="keyword">if</span> (oldFiber === <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">for</span> (; newIdx &lt; newChildren.<span class="property">length</span>; newIdx++) &#123;</span><br><span class="line">      <span class="keyword">var</span> _newFiber = <span class="title function_">createChild</span>(returnFiber, newChildren[newIdx], lanes);</span><br><span class="line">      <span class="comment">// ...省略</span></span><br><span class="line">      lastPlacedIndex = <span class="title function_">placeChild</span>(_newFiber, lastPlacedIndex, newIdx);</span><br><span class="line">      <span class="comment">// ...省略</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> resultingFirstChild;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 情况1：newChildren 和 oldFiber 都没遍历完，说明存在需移动的节点</span></span><br><span class="line">  <span class="comment">// existingChildren 的作用是将 oldFiber 以 key-oldFiber 存到 map 中，实现 O(1) 查找旧节点</span></span><br><span class="line">  <span class="keyword">var</span> existingChildren = <span class="title function_">mapRemainingChildren</span>(returnFiber, oldFiber);</span><br><span class="line">  <span class="keyword">for</span> (; newIdx &lt; newChildren.<span class="property">length</span>; newIdx++) &#123;</span><br><span class="line">    <span class="comment">// 遍历 newChildren，与 oldFiber 索引位置对比，标记是否需要移动</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;  <span class="keyword">var</span> oldFiber = currentFirstChild; <span class="comment">// 旧节点 current Fiber</span></span><br><span class="line">  <span class="keyword">var</span> lastPlacedIndex = <span class="number">0</span>; <span class="comment">// 指的上一个可以复用的，不需要移动的节点的老索引</span></span><br><span class="line">  <span class="keyword">var</span> newIdx = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 第一轮遍历</span></span><br><span class="line">  <span class="keyword">for</span> (; oldFiber !== <span class="literal">null</span> &amp;&amp; newIdx &lt; newChildren.<span class="property">length</span>; newIdx++) &#123;<span class="comment">// 当 oldFiber 或 newChildren遍历完，结束一轮遍历</span></span><br><span class="line">    <span class="comment">// ...省略</span></span><br><span class="line">    <span class="comment">// 1. updateSlot key 不同，返回 null</span></span><br><span class="line">    <span class="comment">// 2. updateSlot key 相同，type 相同，复用旧节点，返回旧节点</span></span><br><span class="line">    <span class="keyword">var</span> newFiber = <span class="title function_">updateSlot</span>(returnFiber, oldFiber, newChildren[newIdx], lanes);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// newFiber 为 null, 当前节点不可复用，跳出第一轮循环</span></span><br><span class="line">    <span class="keyword">if</span> (newFiber === <span class="literal">null</span>) &#123;</span><br><span class="line">      <span class="keyword">if</span> (oldFiber === <span class="literal">null</span>) &#123;</span><br><span class="line">        oldFiber = nextOldFiber;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (shouldTrackSideEffects) &#123;</span><br><span class="line">      <span class="keyword">if</span> (oldFiber &amp;&amp; newFiber.<span class="property">alternate</span> === <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="comment">// key 相同，type 不同，旧节点标记删除，继续遍历</span></span><br><span class="line">        <span class="title function_">deleteChild</span>(returnFiber, oldFiber);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 更新最后一个节点移动的位置索引</span></span><br><span class="line">    lastPlacedIndex = <span class="title function_">placeChild</span>(newFiber, lastPlacedIndex, newIdx);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ...省略</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 情况2：当 newChildren 遍历完，剩下的 oldFiber 没用了，均标记删除</span></span><br><span class="line">    <span class="keyword">if</span> (newIdx === newChildren.<span class="property">length</span>) &#123;</span><br><span class="line">      <span class="title function_">deleteRemainingChildren</span>(returnFiber, oldFiber);</span><br><span class="line">      <span class="keyword">return</span> resultingFirstChild;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 情况3：oldFiber 都遍历完，将剩余的 newChildren 都遍历生成 fiber 标记 Placement</span></span><br><span class="line">    <span class="keyword">if</span> (oldFiber === <span class="literal">null</span>) &#123;</span><br><span class="line">      <span class="keyword">for</span> (; newIdx &lt; newChildren.<span class="property">length</span>; newIdx++) &#123;</span><br><span class="line">        <span class="keyword">var</span> _newFiber = <span class="title function_">createChild</span>(returnFiber, newChildren[newIdx], lanes);</span><br><span class="line">        <span class="comment">// ...省略</span></span><br><span class="line">        lastPlacedIndex = <span class="title function_">placeChild</span>(_newFiber, lastPlacedIndex, newIdx);</span><br><span class="line">        <span class="comment">// ...省略</span></span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> resultingFirstChild;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 情况1：newChildren 和 oldFiber 都没遍历完，说明存在需移动的节点</span></span><br><span class="line">    <span class="comment">// existingChildren 的作用是将 oldFiber 以 key-oldFiber 存到 map 中，实现 O(1) 查找旧节点</span></span><br><span class="line">    <span class="keyword">var</span> existingChildren = <span class="title function_">mapRemainingChildren</span>(returnFiber, oldFiber);</span><br><span class="line">    <span class="keyword">for</span> (; newIdx &lt; newChildren.<span class="property">length</span>; newIdx++) &#123;</span><br><span class="line">      <span class="comment">// 遍历 newChildren，与 oldFiber 索引位置对比，标记是否需要移动</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="javascript">function reconcileChildrenArray(returnFiber, currentFirstChild, newChildren, lanes) &#123;function reconcileChildrenArray(returnFiber, currentFirstChild, newChildren, lanes) &#123;
+  var oldFiber = currentFirstChild; // 旧节点 current Fiber
+  var lastPlacedIndex = 0; // 指的上一个可以复用的，不需要移动的节点的老索引
+  var newIdx = 0;
 
+  // 第一轮遍历
+  for (; oldFiber !== null &amp;&amp; newIdx &lt; newChildren.length; newIdx++) &#123;// 当 oldFiber 或 newChildren遍历完，结束一轮遍历
+    // ...省略
+    // 1. updateSlot key 不同，返回 null
+    // 2. updateSlot key 相同，type 相同，复用旧节点，返回旧节点
+    var newFiber = updateSlot(returnFiber, oldFiber, newChildren[newIdx], lanes);
+
+    // newFiber 为 null, 当前节点不可复用，跳出第一轮循环
+    if (newFiber === null) &#123;
+      if (oldFiber === null) &#123;
+        oldFiber = nextOldFiber;
+      &#125;
+      break;
+    &#125;
+
+    if (shouldTrackSideEffects) &#123;
+      if (oldFiber &amp;&amp; newFiber.alternate === null) &#123;
+        // key 相同，type 不同，旧节点标记删除，继续遍历
+        deleteChild(returnFiber, oldFiber);
+      &#125;
+    &#125;
+    // 更新最后一个节点移动的位置索引
+    lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
+
+    // ...省略
+  &#125;
+
+  // 对第一轮遍历处理情况，进行第二轮处理
+
+  // 情况2：当 newChildren 遍历完，剩下的 oldFiber 没用了，均标记删除
+  if (newIdx === newChildren.length) &#123;
+    deleteRemainingChildren(returnFiber, oldFiber);
+    return resultingFirstChild;
+  &#125;
+
+  // 情况3：oldFiber 都遍历完，将剩余的 newChildren 都遍历生成 fiber 标记 Placement
+  if (oldFiber === null) &#123;
+    for (; newIdx &lt; newChildren.length; newIdx++) &#123;
+      var _newFiber = createChild(returnFiber, newChildren[newIdx], lanes);
+      // ...省略
+      lastPlacedIndex = placeChild(_newFiber, lastPlacedIndex, newIdx);
+      // ...省略
+    &#125;
+    return resultingFirstChild;
+  &#125;
+
+  // 情况1：newChildren 和 oldFiber 都没遍历完，说明存在需移动的节点
+  // existingChildren 的作用是将 oldFiber 以 key-oldFiber 存到 map 中，实现 O(1) 查找旧节点
+  var existingChildren = mapRemainingChildren(returnFiber, oldFiber);
+  for (; newIdx &lt; newChildren.length; newIdx++) &#123;
+    // 遍历 newChildren，与 oldFiber 索引位置对比，标记是否需要移动
+  &#125;
+&#125;  var oldFiber = currentFirstChild; // 旧节点 current Fiber
+  var lastPlacedIndex = 0; // 指的上一个可以复用的，不需要移动的节点的老索引
+  var newIdx = 0;
+
+  // 第一轮遍历
+  for (; oldFiber !== null &amp;&amp; newIdx &lt; newChildren.length; newIdx++) &#123;// 当 oldFiber 或 newChildren遍历完，结束一轮遍历
+    // ...省略
+    // 1. updateSlot key 不同，返回 null
+    // 2. updateSlot key 相同，type 相同，复用旧节点，返回旧节点
+    var newFiber = updateSlot(returnFiber, oldFiber, newChildren[newIdx], lanes);
+
+    // newFiber 为 null, 当前节点不可复用，跳出第一轮循环
+    if (newFiber === null) &#123;
+      if (oldFiber === null) &#123;
+        oldFiber = nextOldFiber;
+      &#125;
+      break;
+    &#125;
+
+    if (shouldTrackSideEffects) &#123;
+      if (oldFiber &amp;&amp; newFiber.alternate === null) &#123;
+        // key 相同，type 不同，旧节点标记删除，继续遍历
+        deleteChild(returnFiber, oldFiber);
+      &#125;
+    &#125;
+    // 更新最后一个节点移动的位置索引
+    lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
+
+    // ...省略
+
+    // 情况2：当 newChildren 遍历完，剩下的 oldFiber 没用了，均标记删除
+    if (newIdx === newChildren.length) &#123;
+      deleteRemainingChildren(returnFiber, oldFiber);
+      return resultingFirstChild;
+    &#125;
+
+    // 情况3：oldFiber 都遍历完，将剩余的 newChildren 都遍历生成 fiber 标记 Placement
+    if (oldFiber === null) &#123;
+      for (; newIdx &lt; newChildren.length; newIdx++) &#123;
+        var _newFiber = createChild(returnFiber, newChildren[newIdx], lanes);
+        // ...省略
+        lastPlacedIndex = placeChild(_newFiber, lastPlacedIndex, newIdx);
+        // ...省略
+      &#125;
+      return resultingFirstChild;
+    &#125;
+
+    // 情况1：newChildren 和 oldFiber 都没遍历完，说明存在需移动的节点
+    // existingChildren 的作用是将 oldFiber 以 key-oldFiber 存到 map 中，实现 O(1) 查找旧节点
+    var existingChildren = mapRemainingChildren(returnFiber, oldFiber);
+    for (; newIdx &lt; newChildren.length; newIdx++) &#123;
+      // 遍历 newChildren，与 oldFiber 索引位置对比，标记是否需要移动
+    &#125;
+  &#125;
+&#125;
+</code></pre>
 <p>多节点 diff 流程图如下：</p>
 <img src="img-4.jpg" width=100% height=400 alt=alt />
 

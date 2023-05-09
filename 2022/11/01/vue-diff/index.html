@@ -254,8 +254,26 @@
 
     <h2 id="简单Diff"><a href="#简单Diff" class="headerlink" title="简单Diff"></a>简单Diff</h2><p>由于操作 DOM 的性能开销是比较大的，所以就出现了 Diff 算法。Diff 算法通过对比新旧 vnode 节点，找出需更新的节点，定向更新。使用 Diff 比较两个节点的时候，只会进行同层比较</p>
 <p>以下面新旧节点为例</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 旧 vnode</span></span><br><span class="line"><span class="keyword">const</span> oldVNode = &#123;</span><br><span class="line">  <span class="attr">type</span>: <span class="string">&#x27;div&#x27;</span>,</span><br><span class="line">  <span class="attr">children</span>: [</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;1&#x27;</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;2&#x27;</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;3&#x27;</span> &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 新 vnode</span></span><br><span class="line"><span class="keyword">const</span> newVNode = &#123;</span><br><span class="line">  <span class="attr">type</span>: <span class="string">&#x27;div&#x27;</span>,</span><br><span class="line">  <span class="attr">children</span>: [</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;4&#x27;</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;5&#x27;</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;6&#x27;</span> &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="javascript">// 旧 vnode
+const oldVNode = &#123;
+  type: &#39;div&#39;,
+  children: [
+    &#123; type: &#39;p&#39;, children: &#39;1&#39; &#125;,
+    &#123; type: &#39;p&#39;, children: &#39;2&#39; &#125;,
+    &#123; type: &#39;p&#39;, children: &#39;3&#39; &#125;
+  ]
+&#125;
 
+// 新 vnode
+const newVNode = &#123;
+  type: &#39;div&#39;,
+  children: [
+    &#123; type: &#39;p&#39;, children: &#39;4&#39; &#125;,
+    &#123; type: &#39;p&#39;, children: &#39;5&#39; &#125;,
+    &#123; type: &#39;p&#39;, children: &#39;6&#39; &#125;
+  ]
+&#125;
+</code></pre>
 <p>没使用 Diff 时，需要执行 6 次 DOM 操作：</p>
 <ul>
 <li>3次 DOM 删除操作，卸载所有节点</li>
@@ -268,12 +286,55 @@
 <img src="img-0.jpg" width=100% height=300 alt=alt />
 
 <p>代码简单实现如下：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">patchChildren</span>(<span class="params">n1, n2, container</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> n2.<span class="property">children</span> === <span class="string">&#x27;string&#x27;</span>) &#123;</span><br><span class="line">    <span class="comment">// 省略</span></span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="title class_">Array</span>.<span class="title function_">isArray</span>(n2.<span class="property">children</span>)) &#123;</span><br><span class="line">    <span class="keyword">const</span> oldChildren = n1.<span class="property">children</span>;</span><br><span class="line">    <span class="keyword">const</span> newChildren = n2.<span class="property">children</span>;</span><br><span class="line">    <span class="keyword">const</span> oldLen = oldChildren.<span class="property">length</span>;</span><br><span class="line">    <span class="keyword">const</span> newLen = newChildren.<span class="property">length</span>;</span><br><span class="line">    <span class="comment">// 两组子节点的公共长度，即两者中较短的那一组子节点的长度</span></span><br><span class="line">    <span class="keyword">const</span> commonLength = <span class="title class_">Math</span>.<span class="title function_">min</span>(oldLen, newLen);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; commonLength; i++) &#123;</span><br><span class="line">      <span class="comment">// 新旧节点逐一diff</span></span><br><span class="line">      <span class="title function_">patch</span>(oldChildren[i], newChildren[i], container);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (newLen &gt; oldLen) &#123;</span><br><span class="line">      <span class="comment">// 新节点数量大于旧节点，说明有新增节点</span></span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">let</span> i = commonLength; i &lt; newLen; i++) &#123;</span><br><span class="line">        <span class="title function_">patch</span>(<span class="literal">null</span>, newChildren[i], container);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (oldLen &gt; newLen) &#123;</span><br><span class="line">      <span class="comment">// 旧节点大于新节点数量，说明有需要卸载的旧节点</span></span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">let</span> i = commonLength; i &lt; oldLen; i++) &#123;</span><br><span class="line">        <span class="title function_">unmount</span>(oldChildren[i]);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 省略</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="javascript">function patchChildren(n1, n2, container) &#123;
+  if (typeof n2.children === &#39;string&#39;) &#123;
+    // 省略
+  &#125; else if (Array.isArray(n2.children)) &#123;
+    const oldChildren = n1.children;
+    const newChildren = n2.children;
+    const oldLen = oldChildren.length;
+    const newLen = newChildren.length;
+    // 两组子节点的公共长度，即两者中较短的那一组子节点的长度
+    const commonLength = Math.min(oldLen, newLen);
+    for (let i = 0; i &lt; commonLength; i++) &#123;
+      // 新旧节点逐一diff
+      patch(oldChildren[i], newChildren[i], container);
+    &#125;
+    if (newLen &gt; oldLen) &#123;
+      // 新节点数量大于旧节点，说明有新增节点
+      for (let i = commonLength; i &lt; newLen; i++) &#123;
+        patch(null, newChildren[i], container);
+      &#125;
+    &#125; else if (oldLen &gt; newLen) &#123;
+      // 旧节点大于新节点数量，说明有需要卸载的旧节点
+      for (let i = commonLength; i &lt; oldLen; i++) &#123;
+        unmount(oldChildren[i]);
+      &#125;
+    &#125;
+  &#125; else &#123;
+    // 省略
+  &#125;
+&#125;
+</code></pre>
 <h3 id="通过key复用节点"><a href="#通过key复用节点" class="headerlink" title="通过key复用节点"></a>通过key复用节点</h3><p>当一个节点的 key 和 tag 都相同的时候，我们就认为这个节点可以复用。节点可复用代表 DOM 元素可复用，不意味着就不需要更新（可能出现文本节点更新，或节点移动情况）</p>
 <p>以下面新旧节点为例：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> oldVNode = &#123;</span><br><span class="line">  <span class="attr">type</span>: <span class="string">&#x27;div&#x27;</span>,</span><br><span class="line">  <span class="attr">children</span>: [</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;p-1&#x27;</span>, <span class="attr">key</span>: <span class="number">1</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;p-2&#x27;</span>, <span class="attr">key</span>: <span class="number">2</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;p-3&#x27;</span>, <span class="attr">key</span>: <span class="number">3</span> &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> newVNode = &#123;</span><br><span class="line">  <span class="attr">type</span>: <span class="string">&#x27;div&#x27;</span>,</span><br><span class="line">  <span class="attr">children</span>: [</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;p-3&#x27;</span>, <span class="attr">key</span>: <span class="number">3</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;p-1&#x27;</span>, <span class="attr">key</span>: <span class="number">1</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">type</span>: <span class="string">&#x27;p&#x27;</span>, <span class="attr">children</span>: <span class="string">&#x27;p-2&#x27;</span>, <span class="attr">key</span>: <span class="number">2</span> &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="javascript">const oldVNode = &#123;
+  type: &#39;div&#39;,
+  children: [
+    &#123; type: &#39;p&#39;, children: &#39;p-1&#39;, key: 1 &#125;,
+    &#123; type: &#39;p&#39;, children: &#39;p-2&#39;, key: 2 &#125;,
+    &#123; type: &#39;p&#39;, children: &#39;p-3&#39;, key: 3 &#125;
+  ]
+&#125;
+const newVNode = &#123;
+  type: &#39;div&#39;,
+  children: [
+    &#123; type: &#39;p&#39;, children: &#39;p-3&#39;, key: 3 &#125;,
+    &#123; type: &#39;p&#39;, children: &#39;p-1&#39;, key: 1 &#125;,
+    &#123; type: &#39;p&#39;, children: &#39;p-2&#39;, key: 2 &#125;
+  ]
+&#125;
+</code></pre>
 <p>对比新旧节点发现只需移动 <code>key:1 和 key:2</code>位置即可，相关 DOM 均可复用</p>
 <img src="img-1.jpg" width=100% height=200 alt=alt />
 
@@ -284,8 +345,48 @@
 <li>取新节点第三个节点 p-2，key 为 2，在旧节点中可找到对应 key 值节点，索引为 1，节点复用，因<code>索引 1&lt;lastIndex=2</code>，打破索引递增顺序，标记 p-2 需移动，无需更新 lastIndex 值</li>
 </ol>
 <p>实现代码如下：</p>
-<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">patchChildren</span>(<span class="params">n1, n2, container</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> n2.<span class="property">children</span> === <span class="string">&#x27;string&#x27;</span>) &#123;</span><br><span class="line">    <span class="comment">// 省略部分代码</span></span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="title class_">Array</span>.<span class="title function_">isArray</span>(n2.<span class="property">children</span>)) &#123;</span><br><span class="line">    <span class="keyword">const</span> oldChildren = n1.<span class="property">children</span></span><br><span class="line">    <span class="keyword">const</span> newChildren = n2.<span class="property">children</span></span><br><span class="line">    <span class="comment">// 用来存储寻找过程中遇到的最大索引值</span></span><br><span class="line">    <span class="keyword">let</span> lastIndex = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; newChildren.<span class="property">length</span>; i++) &#123;</span><br><span class="line">      <span class="keyword">const</span> newVNode = newChildren[i]</span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">let</span> j = <span class="number">0</span>; j &lt; oldChildren.<span class="property">length</span>; j++) &#123;</span><br><span class="line">        <span class="keyword">const</span> oldVNode = oldChildren[j]</span><br><span class="line">        <span class="keyword">if</span> (newVNode.<span class="property">key</span> === oldVNode.<span class="property">key</span>) &#123;</span><br><span class="line">          <span class="title function_">patch</span>(oldVNode, newVNode, container)</span><br><span class="line">          <span class="keyword">if</span> (j &lt; lastIndex) &#123;</span><br><span class="line">            <span class="comment">// 如果当前找到的节点在旧 children 中的索引小于最大索引值 lastIndex</span></span><br><span class="line">            <span class="comment">// 说明该节点对应的真实 DOM 需要移动</span></span><br><span class="line">            <span class="keyword">const</span> prevVNode = newChildren[i - <span class="number">1</span>]</span><br><span class="line">            <span class="comment">// 如果 prevVNode 不存在，说明 newVNode 是第一个节点，不需要移动</span></span><br><span class="line">            <span class="keyword">if</span> (prevVNode) &#123;</span><br><span class="line">              <span class="keyword">const</span> anchor = prevVNode.<span class="property">el</span>.<span class="property">nextSibling</span></span><br><span class="line">              <span class="comment">// 将 newVNode 插入到 anchor 前面</span></span><br><span class="line">              <span class="title function_">insert</span>(newVNode.<span class="property">el</span>, container, anchor)</span><br><span class="line">            &#125;</span><br><span class="line">          &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 如果当前找到的节点在旧 children 中的索引不小于最大索引值，</span></span><br><span class="line">            <span class="comment">// 则更新 lastIndex 的值</span></span><br><span class="line">            lastIndex = j</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">break</span> <span class="comment">// 这里需要 break</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 省略部分代码</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// inset 函数</span></span><br><span class="line">  <span class="title function_">insert</span>(<span class="params">el, parent, anchor = <span class="literal">null</span></span>) &#123;</span><br><span class="line">    parent.<span class="title function_">insertBefore</span>(el, anchor)</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="typescript">function patchChildren(n1, n2, container) &#123;
+  if (typeof n2.children === &#39;string&#39;) &#123;
+    // 省略部分代码
+  &#125; else if (Array.isArray(n2.children)) &#123;
+    const oldChildren = n1.children
+    const newChildren = n2.children
+    // 用来存储寻找过程中遇到的最大索引值
+    let lastIndex = 0
+    for (let i = 0; i &lt; newChildren.length; i++) &#123;
+      const newVNode = newChildren[i]
+      for (let j = 0; j &lt; oldChildren.length; j++) &#123;
+        const oldVNode = oldChildren[j]
+        if (newVNode.key === oldVNode.key) &#123;
+          patch(oldVNode, newVNode, container)
+          if (j &lt; lastIndex) &#123;
+            // 如果当前找到的节点在旧 children 中的索引小于最大索引值 lastIndex
+            // 说明该节点对应的真实 DOM 需要移动
+            const prevVNode = newChildren[i - 1]
+            // 如果 prevVNode 不存在，说明 newVNode 是第一个节点，不需要移动
+            if (prevVNode) &#123;
+              const anchor = prevVNode.el.nextSibling
+              // 将 newVNode 插入到 anchor 前面
+              insert(newVNode.el, container, anchor)
+            &#125;
+          &#125; else &#123;
+            // 如果当前找到的节点在旧 children 中的索引不小于最大索引值，
+            // 则更新 lastIndex 的值
+            lastIndex = j
+          &#125;
+          break // 这里需要 break
+        &#125;
+      &#125;
+    &#125;
+  &#125; else &#123;
+    // 省略部分代码
+  &#125;
 
+// inset 函数
+  insert(el, parent, anchor = null) &#123;
+    parent.insertBefore(el, anchor)
+  &#125;
+</code></pre>
 <h2 id="双端Diff"><a href="#双端Diff" class="headerlink" title="双端Diff"></a>双端Diff</h2><p>双端 Diff 是 vue2 使用的， Diff 算法过程如下：</p>
 <ol>
 <li>给四个指针赋值：<code>newStartIdx=new p-4</code> <code>newEndIdx=new p-3</code> <code>oldStartIdx=old p-1</code> <code>oldEndIdx=old p-4</code>，初始状态如下图，开始第一轮 Diff<ul>
@@ -354,8 +455,41 @@
 </ul>
 </li>
 </ol>
-<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">patchKeyedChildren</span>(<span class="params">n1, n2, container</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> newChildren = n2.<span class="property">children</span></span><br><span class="line">  <span class="keyword">const</span> oldChildren = n1.<span class="property">children</span></span><br><span class="line">  <span class="comment">// 处理相同的前置节点，索引 j 指向新旧两组子节点的开头</span></span><br><span class="line">  <span class="keyword">let</span> j = <span class="number">0</span></span><br><span class="line">  <span class="keyword">let</span> oldVNode = oldChildren[j]</span><br><span class="line">  <span class="keyword">let</span> newVNode = newChildren[j]</span><br><span class="line">  <span class="comment">// while 循环向后遍历，直到遇到拥有不同 key 值的节点为止</span></span><br><span class="line">  <span class="keyword">while</span> (oldVNode.<span class="property">key</span> === newVNode.<span class="property">key</span>) &#123;</span><br><span class="line">    <span class="comment">// 调用 patch 函数进行更新</span></span><br><span class="line">    <span class="title function_">patch</span>(oldVNode, newVNode, container)</span><br><span class="line">    <span class="comment">// 更新索引 j，让其递增</span></span><br><span class="line">    j++</span><br><span class="line">    oldVNode = oldChildren[j]</span><br><span class="line">    newVNode = newChildren[j]</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 更新相同的后置节点，索引 oldEnd 指向旧的一组子节点的最后一个节点</span></span><br><span class="line">  <span class="keyword">let</span> oldEnd = oldChildren.<span class="property">length</span> - <span class="number">1</span></span><br><span class="line">  <span class="comment">// 索引 newEnd 指向新的一组子节点的最后一个节点</span></span><br><span class="line">  <span class="keyword">let</span> newEnd = newChildren.<span class="property">length</span> - <span class="number">1</span></span><br><span class="line">  oldVNode = oldChildren[oldEnd]</span><br><span class="line">  newVNode = newChildren[newEnd]</span><br><span class="line">  <span class="comment">// while 循环从后向前遍历，直到遇到拥有不同 key 值的节点为止</span></span><br><span class="line">  <span class="keyword">while</span> (oldVNode.<span class="property">key</span> === newVNode.<span class="property">key</span>) &#123;</span><br><span class="line">    <span class="comment">// 调用 patch 函数进行更新</span></span><br><span class="line">    <span class="title function_">patch</span>(oldVNode, newVNode, container)</span><br><span class="line">    <span class="comment">// 递减 oldEnd 和 nextEnd</span></span><br><span class="line">    oldEnd--</span><br><span class="line">    newEnd--</span><br><span class="line">    oldVNode = oldChildren[oldEnd]</span><br><span class="line">    newVNode = newChildren[newEnd]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="typescript">function patchKeyedChildren(n1, n2, container) &#123;
+  const newChildren = n2.children
+  const oldChildren = n1.children
+  // 处理相同的前置节点，索引 j 指向新旧两组子节点的开头
+  let j = 0
+  let oldVNode = oldChildren[j]
+  let newVNode = newChildren[j]
+  // while 循环向后遍历，直到遇到拥有不同 key 值的节点为止
+  while (oldVNode.key === newVNode.key) &#123;
+    // 调用 patch 函数进行更新
+    patch(oldVNode, newVNode, container)
+    // 更新索引 j，让其递增
+    j++
+    oldVNode = oldChildren[j]
+    newVNode = newChildren[j]
+  &#125;
 
+  // 更新相同的后置节点，索引 oldEnd 指向旧的一组子节点的最后一个节点
+  let oldEnd = oldChildren.length - 1
+  // 索引 newEnd 指向新的一组子节点的最后一个节点
+  let newEnd = newChildren.length - 1
+  oldVNode = oldChildren[oldEnd]
+  newVNode = newChildren[newEnd]
+  // while 循环从后向前遍历，直到遇到拥有不同 key 值的节点为止
+  while (oldVNode.key === newVNode.key) &#123;
+    // 调用 patch 函数进行更新
+    patch(oldVNode, newVNode, container)
+    // 递减 oldEnd 和 nextEnd
+    oldEnd--
+    newEnd--
+    oldVNode = oldChildren[oldEnd]
+    newVNode = newChildren[newEnd]
+  &#125;
+&#125;
+</code></pre>
 <p>如果回到预处理步骤 3，遍历完发现：</p>
 <ul>
 <li><code>oldEnd &gt;= j</code>，说明预处理过程中，存在未处理完的旧节点，这些遗留的旧节点视为<strong>删除节点</strong>，需要执行卸载处理 </li>
