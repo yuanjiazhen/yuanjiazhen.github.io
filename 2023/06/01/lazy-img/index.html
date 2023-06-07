@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		
+<title>网页性能优化-图片懒加载-Jia</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="shortcut icon" type="image/x-icon" href="/image/favicon.ico">
+
+<link rel="stylesheet" href="/css/index.css">
+
+
+
+<meta name="keywords" content="性能优化,图片懒加载,">
+<meta name="description" content="">
+
+
+<script src="/js/jquery.min.js"></script>
+
+
+<script src="/js/index.js"></script>
+
+
+<script src="/js/fancybox.umd.js"></script>
+
+
+<script src="/js/fancybox-images.js"></script>
+
+
+<script src="/js/gitalk.min.js"></script>
+
+
+<script src="/js/hljs.min.js"></script>
+ 
+<script>hljs.highlightAll();</script>
+
+	<meta name="generator" content="Hexo 5.4.2"></head>
+
+	<body>
+		
+	<div class="header">
+		<div class="header-top" id="header-top">
+			<div class="h-left">
+				<a href="/">
+					<img src="/image/logo.png" alt="Quiet">
+				</a>
+			</div>
+			<div class="h-right">
+				<ul>
+					
+						
+								<li>
+									<a href="/">
+										ARTICLE
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+				</ul>
+			</div>
+			<div class="h-right-close">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+					<path fill="none" d="M0 0h24v24H0z" />
+					<path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z" fill="rgba(68,68,68,1)" />
+				</svg>
+			</div>
+		</div>
+	</div>
+	<div class="sidebar">
+    <div class="topo">
+        <h2>Jia</h2>
+    </div>
+    <ul>
+        
+        <li>
+            <a href="/">ARTICLE</a>
+        </li>
+        
+    </ul>
+    <div class="my_foot">
+        
+        <a href="">
+            <img src="/image/logo.png" alt="Quiet主题">
+        </a>
+        
+    </div>
+</div>
+<div class='shelter'>
+</div>
+<style>
+    .shelter{
+        background-color: #333;
+        opacity:0.5;
+        cursor: pointer;
+        display: none; 
+        position: fixed;
+        left: 0;
+        top: 0; 
+        right: 0;
+        bottom: 0;
+        z-index: 1998;
+    }
+    .sidebar {
+        width: 66%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        bottom: 0;
+        background: #fff;
+        z-index: 1999;
+        text-align: center;
+        box-shadow: -6px 0 20px rgba(98, 94, 94, .815);
+    }
+
+    .topo {
+        width: 100%;
+        height: 200px;
+        background: url(https://api.ixiaowai.cn/gqapi/gqapi.php) no-repeat;
+        background-size: 100% 100%;
+        position: relative;
+        display: flex;
+        align-items: flex-end
+    }
+
+    .topo h2 {
+        color: #fff;
+        z-index: 1;
+        position: relative;
+        margin: 0 0 10px 10px;
+        font-size: 1.2em;
+        box-sizing: border-box
+    }
+
+    .topo:before {
+        content: '';
+        background-image: url(/image/pattern.png);
+        background-repeat: repeat;
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        z-index: 1
+    }
+
+    .sidebar ul {
+        width: 100%;
+        margin-top: 50px
+    }
+
+    .sidebar ul li {
+        height: 50px;
+        list-style: none;
+        font-size: 1.2em;
+        text-align: right;
+        margin-right: 10px
+    }
+
+    .sidebar ul li a {
+        display: grid;
+        color: #5d606a;
+        text-overflow: ellipsis;
+        width: 100%;
+        text-decoration: none
+    }
+
+    .my_foot {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        position: absolute;
+        bottom: 0
+    }
+
+    .my_foot a {
+        text-decoration: none;
+        margin-right: 10px;
+        display: inline-block
+    }
+
+    .my_foot a img {
+        width: 30px;
+        height: 30px
+    }
+</style>
+
+<script>
+    $( function () {
+	$( '.h-right-close>svg' )
+		.click( function () {
+			$( '.sidebar' )
+				.animate( {
+					right: "0"
+				}, 500 );
+			$( '.shelter' )
+				.fadeIn( "slow" )
+		} );
+	$( '.shelter' )
+		.click( function ( e ) {
+			$( '.sidebar' )
+				.animate( {
+					right: "-100%"
+				}, 500 );
+			$( '.shelter' )
+				.fadeOut( "slow" )
+		} )
+} )
+
+</script>
+
+<div class="post">
+    <div class="post-header-background post-header-img">
+<!-- style="background: url('https://api.ixiaowai.cn/gqapi/gqapi.php')" -->
+    <div class="post-header-background-content">
+        <ul class="post-header-tag">
+            
+            
+            <li><a href="/tags/性能优化">性能优化</a></li>
+            
+            <li><a href="/tags/图片懒加载">图片懒加载</a></li>
+            
+            
+        </ul>
+        
+        <h1>网页性能优化-图片懒加载</h1>
+        <div class="post-header-info">
+            <div class="post-header-info-author">
+                
+                    <svg t="1604839279282" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                        xmlns="http://www.w3.org/2000/svg" p-id="2901" width="20" height="20">
+                        <path
+                            d="M513 956.3c-247.7 0-448-200.3-448-448S265.3 66.2 513 66.2s448 200.3 448 448-200.3 442.1-448 442.1z m0-830.9c-212.2 0-388.8 170.7-388.8 388.8C124.2 726.3 294.9 903 513 903c212.2 0 388.8-170.7 388.8-388.8S725.2 125.4 513 125.4z m0 430.2c-94.2 0-170.7-76.5-170.7-170.7S418.8 207.8 513 207.8s170.7 76.5 170.7 170.7S607.2 555.6 513 555.6z m0-289.1c-64.6 0-112 52.8-112 112s47.4 117.9 112 117.9 112-52.8 112-112-47.4-117.9-112-117.9z m0 689.8c-135.7 0-259-58.7-341.9-158.9l-11.8-17.8 11.8-17.8c76.5-117.9 206.2-188.5 347.8-188.5 135.7 0 265 64.6 341.9 182.6l11.8 17.8-11.8 17.8C778 897.1 648.7 956.3 513 956.3zM230.3 773.2C300.9 849.7 406.9 897 513 897c112 0 218.1-47.4 288.6-129.8-70.5-88.2-170.7-135.6-282.7-135.6s-218.1 53.3-288.6 141.6z"
+                            p-id="2902" fill="#ffffff"></path>
+                    </svg>
+                    
+                <span class="post-header-info-author-text"> <a href="../../about">Jia</a></span>
+                <!-- <div class="post-header-info-author-categories">
+                    
+                         <a href="../../categories/浏览器/" target="_blank" >浏览器</a>
+                    
+                </div> -->
+                <p>2023-06-01 21:33:34</p>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="post-content" id="content">
+  
+  <div id="article" class="post-content-info">
+    
+
+    <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>当一次性加载大量图片时，会发起大量的网络请求，而这些请求几乎是并发的（不同浏览器对并发请求策略不同），就会导致资源加载时间过长，影响页面加载速度，影响用户体验，于是就出现图片懒加载方案优化性能</p>
+<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>图片懒加载简单来说就是按需加载资源，当页面中图片进入用户视图时才去加载资源，也可按需求在图片具体出现在视图 X 距离时就提前加载资源</p>
+<h2 id="实现方案"><a href="#实现方案" class="headerlink" title="实现方案"></a>实现方案</h2><p>以下方案均在 React 框架下实现的</p>
+<h3 id="方案一：JS计算"><a href="#方案一：JS计算" class="headerlink" title="方案一：JS计算"></a>方案一：JS计算</h3><p>js 计算核心就是通过比较图片距离视窗高度和视窗高度来判断图片是否进入视图，从而决定是否加载资源<br>实现原理：</p>
+<ol>
+<li>预先生成所有的<code>&lt;img data-src=&quot;https://xxx&quot; src=&#123;loadingImgUrl&#125; alt=&quot;alt&quot;/&gt;</code><ul>
+<li>data-src：存放图片资源地址，之后用于 src 替换</li>
+<li>loadingImgUrl： 预先用 loading 图片占位，多个<code>&lt;img/&gt;</code>使用的是同一个 loading 图片，浏览器只会加载一次</li>
+</ul>
+</li>
+<li>页面挂载之后，注册滚动事件监听（也可按需求注册屏幕尺寸变化、屏幕旋转等会影响图片位置的事件），监听图片是否进入视窗</li>
+<li>通过 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/API/Element/getBoundingClientRect">Element.getBoundingClientRect()</a> 获取目标元素的坐标信息</li>
+<li>比较目标元素的高度是否小于或等于 window.innerHeight，小于的话代表图片进入视窗</li>
+<li>图片进入视窗，用 data-src 值替换 src 值</li>
+<li>当页面卸载或所有图片加载完移除监听</li>
+</ol>
+<pre><code class="javascript">const imgs = [&#39;https://xx-1&#39;, &#39;https://xx-2&#39;, ...]
+function ImgJs() &#123;
+  useEffect(() =&gt; &#123;
+    lazyLoadImg()
+    document.addEventListener(&#39;scroll&#39;, lazyLoadImg)
+    return () =&gt; &#123;
+      document.removeEventListener(&#39;scroll&#39;, lazyLoadImg)
+    &#125;
+  &#125;, [])
+
+  const isInView = (element) =&gt; &#123;
+    const viewHeight = window.innerHeight || document.documentElement.clientHeight
+    const &#123; top, left &#125; = element.getBoundingClientRect()
+    const isFirstInView = top &gt;= 0 &amp;&amp; top &lt;= viewHeight &amp;&amp; left &gt;= 0
+    return isFirstInView
+  &#125;
+
+  // 通过元素与视图窗口高度对比，判断元素是否出现在视图，是否需要加载
+  const lazyLoadImg = dedounce(() =&gt; &#123;
+    const allImg = document.querySelectorAll(&#39;.lazy&#39;)
+
+    // 浏览器加载同一资源地址（loading）不会重复请求的，只会请求一次
+    allImg.forEach(img =&gt; &#123;
+      if (isInView(img)) &#123;
+        // 图片出现在可视区域，加载资源
+        img.src = img.dataset.src
+        img.classList.remove(&#39;lazy&#39;)
+        delete img.dataset.src  // 删除 data-src
+      &#125;
+    &#125;)
+    if (!allImg.length) &#123;
+      // 所有图片加载完，移除监听
+      document.removeEventListener(&#39;scroll&#39;, lazyLoadImg)
+    &#125;
+  &#125;, 100)
+
+  return (
+    &lt;div&gt;
+      &#123;imgs.map((item, index) =&gt; (
+        &lt;img key=&#123;index&#125; data-src=&#123;item&#125; src=&#123;loading&#125; alt=&quot;alt&quot; className=&quot;lazy&quot; /&gt;
+      ))&#125;
+    &lt;/div&gt;
+  );
+&#125;
+</code></pre>
+<h3 id="方案二：IntersectionObserver"><a href="#方案二：IntersectionObserver" class="headerlink" title="方案二：IntersectionObserver"></a>方案二：IntersectionObserver</h3><p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/API/IntersectionObserver">IntersectionObserver</a>核心就是观察目标元素是否进入视窗来判断图片是否加载<br>注意 IntersectionObserver 不兼容 IE，详细兼容表如下</p>
+<img src="img-1.png" width=100% height=200 alt=alt />
+
+<p>实现原理：</p>
+<ol>
+<li>预先生成所有的<code>&lt;img data-src=&quot;https://xxx&quot; src=&#123;loadingImgUrl&#125; alt=&quot;alt&quot; /&gt;</code></li>
+<li>页面挂载之后，注册观察对象 imgObserver</li>
+<li>通过观察元素 isIntersecting 比较目判断是否进入视窗</li>
+<li>图片进入视窗，用 data-src 值替换 src 值，移除观察</li>
+</ol>
+<pre><code class="javascript">function ImgJs() &#123;
+  useEffect(() =&gt; &#123;
+    lazyLoadImg()
+  &#125;, [])
+
+  // 通过 IntersectionObserver 判断元素是否出现在视图，是否需要加载
+  const lazyLoadImg = dedounce(() =&gt; &#123;
+    const allImg = document.querySelectorAll(&#39;.lazy&#39;)
+    const imgObserver = new IntersectionObserver((entries) =&gt; &#123;
+      entries.forEach(item =&gt; &#123;
+        if (item.isIntersecting) &#123;
+          // 元素出现在视图中
+          item.target.src = item.target.dataset.src
+          item.target.classList.remove(&#39;lazy&#39;)
+          delete item.target.dataset.src
+          imgObserver.unobserve(item.target)  // 移除监听
+        &#125;
+      &#125;)
+    &#125;)
+    // 注册所有目标元素的监听
+    allImg.forEach(item =&gt; &#123;
+      imgObserver.observe(item)
+    &#125;)
+  &#125;, 500)
+
+  return (
+    &lt;div&gt;
+      &#123;imgs.map((item, index) =&gt; (
+        &lt;img key=&#123;index&#125; data-src=&#123;item&#125; src=&#123;loading&#125; alt=&quot;alt&quot; className=&quot;lazy&quot; /&gt;
+      ))&#125;
+    &lt;/div&gt;
+  );
+&#125;
+</code></pre>
+<h3 id="当图片为背景图"><a href="#当图片为背景图" class="headerlink" title="当图片为背景图"></a>当图片为背景图</h3><p>当图片为背景图，判断图片进入视图用方案一或方案二都可以，只是在图片资源替换上不通过，如下：</p>
+<pre><code class="javascript">if (item.isIntersecting) &#123;
+  // 元素出现在视图中
+  item.target.classList.remove(&#39;lazy-bg&#39;) // 移除class
+  imgObserver.unobserve(item.target)  // 移除监听
+&#125;
+
+&lt;div&gt;
+  &#123;imgs.map((item, index) =&gt; (
+    &lt;div key=&#123;index&#125; style=&#123;&#123; background: `url($&#123;item&#125;)` &#125;&#125; className=&quot;img lazy-bg&quot; /&gt;
+  ))&#125;
+&lt;/div&gt;
+
+.lazy-bg &#123;
+  background: url(&#39;https://loading&#39;) !important;
+&#125;
+</code></pre>
+
+  </div>
+  <div id=""></div>
+</div>
+
+<script>
+  
+Fancybox.bind('[data-fancybox="fancybox-gallery-img"]', {
+  dragToClose: true,
+  Toolbar: true,
+  closeButton: "top",
+  Image: {
+    zoom: true,
+  },
+  on: {
+    initCarousel: (fancybox) => {
+      const slide = fancybox.Carousel.slides[fancybox.Carousel.page];
+      fancybox.$container.style.setProperty(
+        "--bg-image",
+        `url("${slide.$thumb.src}")`
+      );
+    },
+    "Carousel.change": (fancybox, carousel, to, from) => {
+      const slide = carousel.slides[to];
+      fancybox.$container.style.setProperty(
+        "--bg-image",
+        `url("${slide.$thumb.src}")`
+      );
+    },
+  },
+});
+</script>
+
+<style>
+    #noneimg img {
+        display: none;
+        z-index: 9999;
+        /* width: 600px !important; */
+        min-width: 0%;
+        max-width: 90%;
+        max-height: 80%;
+        border-radius: 0px;
+        position: fixed;
+        box-shadow: 0 0 0px #c3c3c300 !important;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto !important;
+    }
+
+    @media screen and (max-width:600px) {
+        #noneimg img {
+            max-width: 88%
+        }
+    }
+</style>
+
+    <div class="post-paging" style="display: none;">
+    
+
+    
+    <a href="/2023/05/10/algorithm-collect/">
+        <div class="post-paging-next">
+            <span>下一篇</span>
+            <p>前端常见算法汇总（JS）</p>
+        </div>
+    </a>
+    
+</div>
+</div>
+		
+<div class="footer">
+	<div class="Copyright">
+		©2023 By Jia
+	</div>
+	<div class="contact">
+		
+		<a href="">
+			<img src="/image/logo.png" alt="Quiet主题">
+		</a>
+		
+	</div>
+</div>
+
+<script src="/js/gotop.js"></script>
+
+
+<style type="text/css">
+    @media screen and (min-width: 600px) {
+        .goTop>span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            opacity: 0.8;
+            background: rgba(18, 24, 58, 0.06);
+            text-align: center;
+            transition: border .5s;
+            border: 1px solid rgba(18, 24, 58, 0.06);
+
+            -moz-transition: border .5s;
+            /* Firefox 4 */
+            -webkit-transition: border .5s;
+            /* Safari 和 Chrome */
+            -o-transition: border .5s;
+            /* Opera */
+        }
+
+        .goTop>span:hover {
+            border: 1px solid #6680B3;
+        }
+
+
+        .goTop {
+            position: fixed;
+            right: 30px;
+            bottom: 80px;
+        }
+
+        .goTop>span>svg {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+        }
+
+    }
+
+    @media screen and (max-width: 600px) {
+        .goTop {
+            display: none;
+        }
+    }
+</style>
+<div class="goTop" id="js-go_top">
+    <span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <g>
+                <path d="M13 12v8h-2v-8H4l8-8 8 8z"></path>
+            </g>
+        </svg>
+    </span>
+</div>
+<script>
+    $( '#js-go_top' )
+	.gotoTop( {
+		offset: 500,
+		speed: 300,
+		animationShow: {
+			'transform': 'translate(0,0)',
+			'transition': 'transform .5s ease-in-out'
+		},
+		animationHide: {
+			'transform': 'translate(100px,0)',
+			'transition': 'transform .5s ease-in-out'
+		}
+	} );
+</script>
+
+
+    <!-- Gitalk -->
+    <script>
+        const data = '{"clientID":"02b3c","clientSecret":"adfc7b4","repo":"gimment","owner":"duneng","admin":"duneng"}'
+        const gitalk = new Gitalk({
+            ...JSON.parse( data),
+            id:location.pathname,
+            distractionFreeMode:false
+        })
+        
+        if(Boolean('false')){
+            gitalk.render('gitalk-container')
+        }
+    </script>
+
+<script>
+	console.log('\n %c Hexo-Quiet 主题 %c https://github.com/79e/hexo-theme-quiet \n', 'color: #fadfa3; background: #030307; padding:5px 0;', 'background: #fadfa3; padding:5px 0;')
+</script>
+	</body>
+</html>
+
