@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		
+<title>React性能优化常见API-Jia</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="shortcut icon" type="image/x-icon" href="/image/favicon.ico">
+
+<link rel="stylesheet" href="/css/index.css">
+
+
+
+<meta name="keywords" content="性能优化,react,">
+<meta name="description" content="">
+
+
+<script src="/js/jquery.min.js"></script>
+
+
+<script src="/js/index.js"></script>
+
+
+<script src="/js/fancybox.umd.js"></script>
+
+
+<script src="/js/fancybox-images.js"></script>
+
+
+<script src="/js/gitalk.min.js"></script>
+
+
+<script src="/js/hljs.min.js"></script>
+ 
+<script>hljs.highlightAll();</script>
+
+	<meta name="generator" content="Hexo 5.4.2"></head>
+
+	<body>
+		
+	<div class="header">
+		<div class="header-top" id="header-top">
+			<div class="h-left">
+				<a href="/">
+					<img src="/image/logo.png" alt="Quiet">
+				</a>
+			</div>
+			<div class="h-right">
+				<ul>
+					
+						
+								<li>
+									<a href="/">
+										ARTICLE
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+				</ul>
+			</div>
+			<div class="h-right-close">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+					<path fill="none" d="M0 0h24v24H0z" />
+					<path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z" fill="rgba(68,68,68,1)" />
+				</svg>
+			</div>
+		</div>
+	</div>
+	<div class="sidebar">
+    <div class="topo">
+        <h2>Jia</h2>
+    </div>
+    <ul>
+        
+        <li>
+            <a href="/">ARTICLE</a>
+        </li>
+        
+    </ul>
+    <div class="my_foot">
+        
+        <a href="">
+            <img src="/image/logo.png" alt="Quiet主题">
+        </a>
+        
+    </div>
+</div>
+<div class='shelter'>
+</div>
+<style>
+    .shelter{
+        background-color: #333;
+        opacity:0.5;
+        cursor: pointer;
+        display: none; 
+        position: fixed;
+        left: 0;
+        top: 0; 
+        right: 0;
+        bottom: 0;
+        z-index: 1998;
+    }
+    .sidebar {
+        width: 66%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        bottom: 0;
+        background: #fff;
+        z-index: 1999;
+        text-align: center;
+        box-shadow: -6px 0 20px rgba(98, 94, 94, .815);
+    }
+
+    .topo {
+        width: 100%;
+        height: 200px;
+        background: url(https://api.ixiaowai.cn/gqapi/gqapi.php) no-repeat;
+        background-size: 100% 100%;
+        position: relative;
+        display: flex;
+        align-items: flex-end
+    }
+
+    .topo h2 {
+        color: #fff;
+        z-index: 1;
+        position: relative;
+        margin: 0 0 10px 10px;
+        font-size: 1.2em;
+        box-sizing: border-box
+    }
+
+    .topo:before {
+        content: '';
+        background-image: url(/image/pattern.png);
+        background-repeat: repeat;
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        z-index: 1
+    }
+
+    .sidebar ul {
+        width: 100%;
+        margin-top: 50px
+    }
+
+    .sidebar ul li {
+        height: 50px;
+        list-style: none;
+        font-size: 1.2em;
+        text-align: right;
+        margin-right: 10px
+    }
+
+    .sidebar ul li a {
+        display: grid;
+        color: #5d606a;
+        text-overflow: ellipsis;
+        width: 100%;
+        text-decoration: none
+    }
+
+    .my_foot {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        position: absolute;
+        bottom: 0
+    }
+
+    .my_foot a {
+        text-decoration: none;
+        margin-right: 10px;
+        display: inline-block
+    }
+
+    .my_foot a img {
+        width: 30px;
+        height: 30px
+    }
+</style>
+
+<script>
+    $( function () {
+	$( '.h-right-close>svg' )
+		.click( function () {
+			$( '.sidebar' )
+				.animate( {
+					right: "0"
+				}, 500 );
+			$( '.shelter' )
+				.fadeIn( "slow" )
+		} );
+	$( '.shelter' )
+		.click( function ( e ) {
+			$( '.sidebar' )
+				.animate( {
+					right: "-100%"
+				}, 500 );
+			$( '.shelter' )
+				.fadeOut( "slow" )
+		} )
+} )
+
+</script>
+
+<div class="post">
+    <div class="post-header-background post-header-img">
+<!-- style="background: url('https://api.ixiaowai.cn/gqapi/gqapi.php')" -->
+    <div class="post-header-background-content">
+        <ul class="post-header-tag">
+            
+            
+            <li><a href="/tags/性能优化">性能优化</a></li>
+            
+            <li><a href="/tags/react">react</a></li>
+            
+            
+        </ul>
+        
+        <h1>React性能优化常见API</h1>
+        <div class="post-header-info">
+            <div class="post-header-info-author">
+                
+                    <svg t="1604839279282" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                        xmlns="http://www.w3.org/2000/svg" p-id="2901" width="20" height="20">
+                        <path
+                            d="M513 956.3c-247.7 0-448-200.3-448-448S265.3 66.2 513 66.2s448 200.3 448 448-200.3 442.1-448 442.1z m0-830.9c-212.2 0-388.8 170.7-388.8 388.8C124.2 726.3 294.9 903 513 903c212.2 0 388.8-170.7 388.8-388.8S725.2 125.4 513 125.4z m0 430.2c-94.2 0-170.7-76.5-170.7-170.7S418.8 207.8 513 207.8s170.7 76.5 170.7 170.7S607.2 555.6 513 555.6z m0-289.1c-64.6 0-112 52.8-112 112s47.4 117.9 112 117.9 112-52.8 112-112-47.4-117.9-112-117.9z m0 689.8c-135.7 0-259-58.7-341.9-158.9l-11.8-17.8 11.8-17.8c76.5-117.9 206.2-188.5 347.8-188.5 135.7 0 265 64.6 341.9 182.6l11.8 17.8-11.8 17.8C778 897.1 648.7 956.3 513 956.3zM230.3 773.2C300.9 849.7 406.9 897 513 897c112 0 218.1-47.4 288.6-129.8-70.5-88.2-170.7-135.6-282.7-135.6s-218.1 53.3-288.6 141.6z"
+                            p-id="2902" fill="#ffffff"></path>
+                    </svg>
+                    
+                <span class="post-header-info-author-text"> <a href="../../about">Jia</a></span>
+                <!-- <div class="post-header-info-author-categories">
+                    
+                         <a href="../../categories/react/" target="_blank" >react</a>
+                    
+                </div> -->
+                <p>2023-06-06 23:01:15</p>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="post-content" id="content">
+  
+  <div id="article" class="post-content-info">
+    
+
+    <h2 id="PureComponent"><a href="#PureComponent" class="headerlink" title="PureComponent"></a>PureComponent</h2><p>作用：纯组件，缓存类组件，当组件 props、state 变化时 re-render</p>
+<pre><code class="javascript">// 子组件
+export default class Greeting extends React.PureComponent &#123;
+  render() &#123;
+    // 父组件 address 改变不会导致 &lt;Greeting/&gt; 重新渲染
+      // 父组件 name 改变会导致 &lt;Greeting/&gt; 重新渲染
+    console.log(&#39;Greeting was rendered&#39;)
+    return &lt;h3&gt;Hello &#123;this.props.name&#125;&lt;/h3&gt;
+  &#125;
+&#125;
+// 父组件
+export default class MyApp extends React.Component &#123;
+  state = &#123;
+    name: &#39;&#39;,
+    address: &#39;&#39;
+  &#125;
+  render() &#123;
+    return (
+      &lt;&gt;
+        &lt;input value=&#123;this.state.name&#125; onChange=&#123;e =&gt; this.setState(&#123; name: e.target.value &#125;)&#125; /&gt;
+        &lt;input value=&#123;this.state.address&#125; onChange=&#123;e =&gt; this.setState(&#123; address: e.target.value &#125;)&#125; /&gt;
+        &lt;Greeting name=&#123;name&#125; /&gt;
+      &lt;/&gt;
+    )
+  &#125;
+&#125;
+</code></pre>
+<p>原理：PureComponent 内在 shouldComponentUpdate 生命周期对 props 和 state 进行浅比较，判断是否需要更新组件</p>
+<h2 id="memo"><a href="#memo" class="headerlink" title="memo"></a>memo</h2><p>背景：在 React 中，当组件的 props 和 state 改变时，当前组件及子孙组件都会重新渲染，但一些文件（如纯文本组件）是无需重新渲染的，于是就有了 <a target="_blank" rel="noopener" href="https://react.dev/reference/react/memo">memo</a><br>作用：memo 作用是缓存函数组件，当组件 props 没有改变跳过重渲染</p>
+<pre><code class="javascript">import &#123; memo, useState &#125; from &#39;react&#39;;
+export default function MyApp() &#123;
+  const [name, setName] = useState(&#39;&#39;);
+  const [address, setAddress] = useState(&#39;&#39;);
+  return (
+    &lt;&gt;
+      &lt;input value=&#123;name&#125; onChange=&#123;e =&gt; setName(e.target.value)&#125; /&gt;
+      &lt;input value=&#123;address&#125; onChange=&#123;e =&gt; setAddress(e.target.value)&#125; /&gt;
+      &lt;Greeting name=&#123;name&#125; /&gt;
+    &lt;/&gt;
+  );
+&#125;
+
+const Greeting = memo(function Greeting(&#123; name &#125;) &#123;
+  // 父组件 address 改变不会导致 &lt;Greeting/&gt; 重新渲染
+  // 父组件 name 改变会导致 &lt;Greeting/&gt; 重新渲染
+  console.log(&quot;Greeting was rendered&quot;);
+  return &lt;h3&gt;Hello &#123;name&#125;&lt;/h3&gt;;
+&#125;);
+</code></pre>
+<p>原理：<code>memo(Component, arePropsEqual?)</code>是一个高阶组件，对更新前后 props 进行浅比较，props 有变化则重新渲染 memo 包裹的组件，反之不渲染，返回缓存中的组件<br>以下为 React.memo() 部分源码</p>
+<pre><code class="javascript">function updateMemoComponent(current, workInProgress, Component, nextProps, updateLanes, renderLanes) &#123;
+  // ...
+  var currentChild = current.child; // This is always exactly one child
+
+  if (!includesSomeLane(updateLanes, renderLanes)) &#123;
+    var prevProps = currentChild.memoizedProps; // Default to shallow comparison
+    var compare = Component.compare;
+    compare = compare !== null ? compare : shallowEqual;
+
+    if (compare(prevProps, nextProps) &amp;&amp; current.ref === workInProgress.ref) &#123;
+      // 复用组件返回，避免组件进入下面重新渲染逻辑
+      return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
+    &#125;
+  &#125; 
+
+  // 重新渲染组件并返回结果
+  var newChild = createWorkInProgress(currentChild, nextProps);
+  return newChild;
+&#125;
+
+
+function shallowEqual(objA, objB) &#123;
+  // objectIs 采用的是 Object.is() 来比较两个值是否相同
+  if (objectIs(objA, objB)) &#123;
+    return true;
+  &#125;
+  // ...以下是一系列 objA 与 objB 类型的比较情况
+  return true;
+&#125;
+</code></pre>
+<ol>
+<li>使用 compare 对 prevProps 和 nextProps 进行浅比较<ul>
+<li>shallowEqual()：核心是用 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/is">Object.is()</a> 进行值等比较</li>
+</ul>
+</li>
+<li>浅比较返回 true：调用 bailoutOnAlreadyFinishedWork() 复用组件，不进入组件重渲染逻辑</li>
+<li>浅比较返回 fale：调用 createWorkInProgress 创建新组件返回</li>
+</ol>
+<h2 id="useMemo"><a href="#useMemo" class="headerlink" title="useMemo"></a>useMemo</h2><p>背景：当组件重新渲染时，一些复杂的计算也会重新计算消耗性能<br>作用：useMemo(calculateValue, dependencies) 仅当依赖项发生变化时，<a target="_blank" rel="noopener" href="https://react.dev/reference/react/useMemo#usememo">usememo</a> 会重新计算，反之返回上一次计算的结果，类似 Vue computed 属性</p>
+<pre><code class="javascript">import &#123; useMemo, useState &#125; from &quot;react&quot;;
+
+function TodoList(&#123; todos, tab &#125;) &#123;
+  const [name, setName] = useState(&quot;&quot;);
+  const [count, setCount] = useState(0);
+
+  // 当 name 改变导致 TodoList render 时，addOne 不会重新计算
+  // 仅当 count 改变时，addOne 才会重新计算
+  const addOne = useMemo(() =&gt; count + 1, [count]);
+
+  return (
+    &lt;div&gt;
+      &lt;div onClick=&#123;setCount(count + 1)&#125;&gt;addOne: &#123;&#123; addOne &#125;&#125;&lt;/div&gt;
+      &lt;input value=&#123;name&#125; onChange=&#123;(e) =&gt; setName(e.target.value)&#125; /&gt;
+    &lt;/div&gt;
+  );
+&#125;
+</code></pre>
+<p>原理：对 render 前后的依赖项逐个进行浅比较，值均相等，则返回上一次缓存的计算结果，反之，重新计算值并返回<br>以下为 React.useMemo() 部分源码</p>
+<pre><code class="javascript">function updateMemo(nextCreate, deps) &#123;
+  var hook = updateWorkInProgressHook();
+  var nextDeps = deps === undefined ? null : deps;
+  var prevState = hook.memoizedState;
+
+  if (prevState !== null) &#123;
+    if (nextDeps !== null) &#123;
+      var prevDeps = prevState[1];
+      // prevState 和 nextDeps 不为 null 后，调用 areHookInputsEqual 比较依赖项是否有变化
+      // 依赖项无变化，返回上一次计算的结果
+      if (areHookInputsEqual(nextDeps, prevDeps)) &#123;
+        return prevState[0];
+      &#125;
+    &#125;
+  &#125;
+
+  // 使用 nextCreate() 重新计算值，并返回计算后的结果
+  var nextValue = nextCreate();
+  // 将计算的结果缓存在 memoizedState 中
+  hook.memoizedState = [nextValue, nextDeps];
+  return nextValue;
+&#125;
+
+function areHookInputsEqual(nextDeps, prevDeps) &#123;
+  // ...
+  for (var i = 0; i &lt; prevDeps.length &amp;&amp; i &lt; nextDeps.length; i++) &#123;
+    // 使用 Object.is() 对依赖项挨个进行值的浅比较
+    if (objectIs(nextDeps[i], prevDeps[i])) &#123;
+      continue;
+    &#125;
+    return false;
+  &#125;
+  return true;
+&#125;
+</code></pre>
+<ol>
+<li>依次判断 prevDeps、nextDeps 均不为空时，调用 areHookInputsEqual 进行 prevDeps、nextDeps 值等浅比较<ul>
+<li>areHookInputsEqual：遍历依赖项，逐个调用 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/is">Object.is()</a> 进行值等比较，有一个不相等，中止比较，走重新计算逻辑</li>
+</ul>
+</li>
+<li>当浅比较为 false 或 prevDeps、nextDeps 存在为 null 时，重新计算值<ul>
+<li>调用 nextCreate() 重新计算值，并返回结果</li>
+<li>将结果缓存在 hook.memoizedState 中，供下次比较使用</li>
+<li>返回新计算的结果</li>
+</ul>
+</li>
+</ol>
+<h2 id="useCallback"><a href="#useCallback" class="headerlink" title="useCallback"></a>useCallback</h2><p>背景：当父组件重新渲染时，父组件内的变量、函数都会重新创建，传给子组件，就会导致子组件的更新<br>作用：useCallback(fn, dependencies) 仅当依赖项发生变化时，<a target="_blank" rel="noopener" href="https://react.dev/reference/react/useCallback">useCallback</a> 返回新的函数，否则返回上一次缓存的函数<br>用上述 memo 中的例子改造举例一下：</p>
+<pre><code class="javascript">import &#123; memo, useCallback, useState &#125; from &quot;react&quot;;
+export default function MyApp() &#123;
+  const [name, setName] = useState(&quot;&quot;);
+  const [address, setAddress] = useState(&quot;&quot;);
+
+  // 不使用 useCallback，address 变化也会导致&lt;MyApp/&gt;重新渲染，从而创建新的handleClick函数
+  // 对于子组件 &lt;Greeting/&gt; 来说就是 props 发生了变化，所以也会重新渲染
+  // const handleClick=()=&gt;&#123;
+  //   console.log(&#39;is click&#39;)
+  // &#125;
+
+  // 使用 useCallback 包裹后，useCallback 内的函数仅在 name 变化时才会重新创建，&lt;Greeting/&gt; 才会重新渲染
+  const handleClick = useCallback(() =&gt; &#123;
+    console.log(&quot;is click&quot;, name);
+  &#125;, [name]);
+
+  return (
+    &lt;&gt;
+      &lt;label&gt;
+        name:
+        &lt;input value=&#123;name&#125; onChange=&#123;(e) =&gt; setName(e.target.value)&#125; /&gt;
+      &lt;/label&gt;
+      &lt;label&gt;
+        address:
+        &lt;input value=&#123;address&#125; onChange=&#123;(e) =&gt; setAddress(e.target.value)&#125; /&gt;
+      &lt;/label&gt;
+      &lt;Greeting name=&#123;name&#125; handleClick=&#123;handleClick&#125; /&gt;
+    &lt;/&gt;
+  );
+&#125;
+
+const Greeting = memo(function Greeting(&#123; name, handleClick &#125;) &#123;
+  // 父组件 address 改变不会导致 &lt;Greeting/&gt; 重新渲染
+  // 父组件 name 改变会导致 &lt;Greeting/&gt; 重新渲染
+  console.log(&quot;Greeting was rendered&quot;);
+  return &lt;h3 onClick=&#123;handleClick&#125;&gt;my name is: &#123;name&#125;&lt;/h3&gt;;
+&#125;);
+</code></pre>
+<p>从例子中可以发现：</p>
+<ol>
+<li>子组件<code>&lt;Greeting/&gt;</code>的 props 有 name 和 handleClick</li>
+<li>用 memo 包裹 <code>&lt;Greeting/&gt;</code>组件之后，仅当 props 改变才会导致 <code>&lt;Greeting/&gt;</code> render</li>
+<li>当 address 改变后，会造成 handleClick() 函数重新创建一个新实例，导致 props 改变，触发 <code>&lt;Greeting/&gt;</code> render</li>
+<li>用 useCallback 包裹 handleClick() 后，仅当 name 变化时才会创建新的 handleClick 实例，减少了 <code>&lt;Greeting/&gt;</code> render 次数</li>
+</ol>
+<p>原理：实现原理和 useMemo 基本一直，区别在于 useCallback 缓存和返回的是回调函数，useMemo 是计算后的值</p>
+<pre><code class="javascript">function updateCallback(callback, deps) &#123;
+  var hook = updateWorkInProgressHook();
+  var nextDeps = deps === undefined ? null : deps;
+  var prevState = hook.memoizedState;
+
+  if (prevState !== null) &#123;
+    if (nextDeps !== null) &#123;
+      var prevDeps = prevState[1];
+
+      if (areHookInputsEqual(nextDeps, prevDeps)) &#123;
+        return prevState[0];
+      &#125;
+    &#125;
+  &#125;
+
+  // 区别
+  hook.memoizedState = [callback, nextDeps];
+  return callback;
+&#125;
+</code></pre>
+<h2 id="lazy…Suspense"><a href="#lazy…Suspense" class="headerlink" title="lazy…Suspense"></a>lazy…Suspense</h2><p>lazy 作用：延迟组件加载，直到组件需要呈现时才加载，减少首屏加载 js 的体积，加快加载时间<br>suspense 作用：是一个组件，搭配 lazy 使用，可通过 fallback 来设置等待加载时需要显示的内容</p>
+<p>使用例子如下：</p>
+<pre><code class="javascript">import &#123; lazy &#125; from &#39;react&#39;;
+const MarkdownPreview = lazy(() =&gt; import(&#39;./MarkdownPreview.js&#39;));
+
+// MarkdownPreview 未加载之前显示 Loading 内容
+&lt;Suspense fallback=&#123;&lt;Loading /&gt;&#125;&gt;
+  &lt;MarkdownPreview /&gt;
+&lt;/Suspense&gt;
+</code></pre>
+<p>原理：</p>
+<ol>
+<li>使用 lazy 引入的组件，首次渲染时，执行异步 import 函数，自动代码切割，打包成一个 chunk，动态加载该模块，并返回一个 promise</li>
+<li>lazy 检查模块状态为 resolved：代表模块已被加载，直接返回模块</li>
+<li>模块状态不为 resolved：将 thenable 通过 throw 向上层抛出</li>
+<li>React 会错误异常捕获，捕获到是 thenable 后，会找到 Suspense 组件，判断 thenable 状态</li>
+<li>thenable 为 pending：将子组件渲染成 fallback 的内容</li>
+<li>thenable 被 resolve：Suspense 子组件重新渲染（替换到 fallback）</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><strong>React.PureComponent():</strong></p>
+<ol>
+<li>作用：缓存 class 类组件，只在 props 或 state 改变时 re-render</li>
+<li>原理：在  shouldComponentUpdate 内对 props 和 state 进行浅比较，判断是否需要 re-render</li>
+<li>缺点：无法缓存函数组件；无法比较引用类型</li>
+</ol>
+<p><strong>React.memo():</strong></p>
+<ol>
+<li>作用：缓存函数组件，只在 props 改变时 re-render</li>
+<li>原理：用 Object.is() 对更新前后 props 进行浅比较，判断是否需要渲染</li>
+<li>缺点：因为是浅比较，所以无法比较引用类型，使用引用类型，依旧会 re-render</li>
+</ol>
+<p><strong>React.useMemo()：</strong></p>
+<ol>
+<li>作用：缓存计算值，当 deps 改变时重新计算</li>
+<li>原理：用 Object.is() 对 deps 中逐个浅比较，判断是否需要重新计算</li>
+<li>缺点：闭包原理，占用内存</li>
+</ol>
+<p><strong>React.useCallback()：</strong></p>
+<ol>
+<li>作用：缓存函数，deps 改变时创建新函数，减少子组件 re-render</li>
+<li>原理：用 Object.is() 对 deps 中逐个浅比较，判断是否需要重新创建</li>
+<li>缺点：闭包原理，占用内存</li>
+</ol>
+<p><strong>React.lazy…Suspense：</strong></p>
+<ol>
+<li>作用：延迟按需加载组件，优化首屏加载速度</li>
+<li>原理：用 import 切割代码，返回 promise，直到 resolve 才渲染 Suspense 的子组件</li>
+<li>缺点：打包的 chunk 会重复加载依赖，并存在样式丢失问题，需配合 Plugin 使用</li>
+</ol>
+
+  </div>
+  <div id=""></div>
+</div>
+
+<script>
+  
+Fancybox.bind('[data-fancybox="fancybox-gallery-img"]', {
+  dragToClose: true,
+  Toolbar: true,
+  closeButton: "top",
+  Image: {
+    zoom: true,
+  },
+  on: {
+    initCarousel: (fancybox) => {
+      const slide = fancybox.Carousel.slides[fancybox.Carousel.page];
+      fancybox.$container.style.setProperty(
+        "--bg-image",
+        `url("${slide.$thumb.src}")`
+      );
+    },
+    "Carousel.change": (fancybox, carousel, to, from) => {
+      const slide = carousel.slides[to];
+      fancybox.$container.style.setProperty(
+        "--bg-image",
+        `url("${slide.$thumb.src}")`
+      );
+    },
+  },
+});
+</script>
+
+<style>
+    #noneimg img {
+        display: none;
+        z-index: 9999;
+        /* width: 600px !important; */
+        min-width: 0%;
+        max-width: 90%;
+        max-height: 80%;
+        border-radius: 0px;
+        position: fixed;
+        box-shadow: 0 0 0px #c3c3c300 !important;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto !important;
+    }
+
+    @media screen and (max-width:600px) {
+        #noneimg img {
+            max-width: 88%
+        }
+    }
+</style>
+
+    <div class="post-paging" style="display: none;">
+    
+
+    
+    <a href="/2023/06/01/lazy-img/">
+        <div class="post-paging-next">
+            <span>下一篇</span>
+            <p>网页性能优化-图片懒加载</p>
+        </div>
+    </a>
+    
+</div>
+</div>
+		
+<div class="footer">
+	<div class="Copyright">
+		©2023 By Jia
+	</div>
+	<div class="contact">
+		
+		<a href="">
+			<img src="/image/logo.png" alt="Quiet主题">
+		</a>
+		
+	</div>
+</div>
+
+<script src="/js/gotop.js"></script>
+
+
+<style type="text/css">
+    @media screen and (min-width: 600px) {
+        .goTop>span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            opacity: 0.8;
+            background: rgba(18, 24, 58, 0.06);
+            text-align: center;
+            transition: border .5s;
+            border: 1px solid rgba(18, 24, 58, 0.06);
+
+            -moz-transition: border .5s;
+            /* Firefox 4 */
+            -webkit-transition: border .5s;
+            /* Safari 和 Chrome */
+            -o-transition: border .5s;
+            /* Opera */
+        }
+
+        .goTop>span:hover {
+            border: 1px solid #6680B3;
+        }
+
+
+        .goTop {
+            position: fixed;
+            right: 30px;
+            bottom: 80px;
+        }
+
+        .goTop>span>svg {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+        }
+
+    }
+
+    @media screen and (max-width: 600px) {
+        .goTop {
+            display: none;
+        }
+    }
+</style>
+<div class="goTop" id="js-go_top">
+    <span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <g>
+                <path d="M13 12v8h-2v-8H4l8-8 8 8z"></path>
+            </g>
+        </svg>
+    </span>
+</div>
+<script>
+    $( '#js-go_top' )
+	.gotoTop( {
+		offset: 500,
+		speed: 300,
+		animationShow: {
+			'transform': 'translate(0,0)',
+			'transition': 'transform .5s ease-in-out'
+		},
+		animationHide: {
+			'transform': 'translate(100px,0)',
+			'transition': 'transform .5s ease-in-out'
+		}
+	} );
+</script>
+
+
+    <!-- Gitalk -->
+    <script>
+        const data = '{"clientID":"02b3c","clientSecret":"adfc7b4","repo":"gimment","owner":"duneng","admin":"duneng"}'
+        const gitalk = new Gitalk({
+            ...JSON.parse( data),
+            id:location.pathname,
+            distractionFreeMode:false
+        })
+        
+        if(Boolean('false')){
+            gitalk.render('gitalk-container')
+        }
+    </script>
+
+<script>
+	console.log('\n %c Hexo-Quiet 主题 %c https://github.com/79e/hexo-theme-quiet \n', 'color: #fadfa3; background: #030307; padding:5px 0;', 'background: #fadfa3; padding:5px 0;')
+</script>
+	</body>
+</html>
+
